@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS for Page Styling -->
+    <style>
+        body {
+            background-image: url({% static 'MainApp/images/login.jpg' %});
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-top: 100px;
+        }
+    </style>   
+</head>
+<body>
+    <div class="container login-container">
+        <h2 class="text-center">Login</h2>
+        <form id="loginForm" onsubmit="return validateForm()">{% csrf_token %}
+            <!-- Email Field -->
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required onkeyup="validateEmail()">
+                <span id="email-error" class="text-danger"></span>
+            </div>
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required onkeyup="validatePassword()">
+                <span id="password-error" class="text-danger"></span>
+            </div>
+            <!-- New Password Field (For Forgot Password) -->
+            <div class="form-group" id="newPasswordContainer" style="display: none;">
+                <label for="newPassword">New Password</label>
+                <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="Enter your new password">
+            </div>
+            <!-- Forgot Password Link -->
+            <p class="text-right"><a href="#" id="forgotPasswordLink">Forgot Password?</a></p>
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </form>
+    </div>
+
+    <!-- Include Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <!-- JavaScript Validation -->
+    <script>
+        function validateEmail() {
+            // Validation logic for email
+            var email = document.getElementById("email").value;
+            var errorSpan = document.getElementById("email-error");
+        
+            if (/\s/.test(email)) {
+                errorSpan.textContent = "Email should not contain spaces.";
+            } else if (!/^[a-zA-Z0-9._-]+@gmail\.com$/.test(email)) {
+                errorSpan.textContent = "Email should contain the '@' symbol and end with 'gmail.com'.";
+            } else {
+                errorSpan.textContent = "";
+            }
+        }
+
+        function validatePassword() {
+            // Validation logic for password
+            var password = document.getElementById("password").value;
+            var errorSpan = document.getElementById("password-error");
+
+            if (password.length < 6) {
+                errorSpan.textContent = "Password should be at least 6 characters.";
+            } else {
+                errorSpan.textContent = "";
+            }
+        }
+
+        function validateForm() {
+            // Validate email and password fields
+            validateEmail();
+            validatePassword();
+
+            // Check if the "New Password" field is displayed (for password recovery)
+            if (document.getElementById("newPasswordContainer").style.display === "block") {
+                var newPassword = document.getElementById("newPassword").value;
+                if (newPassword.length < 6) {
+                    alert("New password should be at least 6 characters.");
+                    return false;
+                }
+            }
+
+            // Form is valid, submit it
+            return true;
+        }
+
+        // Toggle the display of the "New Password" field when clicking the "Forgot Password" link
+        document.getElementById("forgotPasswordLink").addEventListener("click", function(event) {
+            event.preventDefault();
+            var newPasswordContainer = document.getElementById("newPasswordContainer");
+
+            // Toggle the display (show/hide) of the "New Password" field
+            newPasswordContainer.style.display = (newPasswordContainer.style.display === "none") ? "block" : "none";
+        });
+    </script>
+</body>
+</html>

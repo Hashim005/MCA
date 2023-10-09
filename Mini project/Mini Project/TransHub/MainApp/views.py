@@ -1,11 +1,14 @@
 from collections import UserDict
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
+
+from TransHub.settings import EMAIL_HOST_USER
 from .models import Users
+from django.core.mail import send_mail
 # from django.http import HttpResponse
 
 @never_cache
@@ -55,7 +58,27 @@ def logout_user(request):
           logout(request)
      return redirect('showindex')   
 
+import random
+def generateOTP():
+     generatedOTP = "".join(str(random.randint(0, 9)) for _ in range(6))
+     return generatedOTP
+
+
 #@login_required(login_url='login')
 @never_cache
 def Home(request):
      return render(request, 'home.html')
+
+def validateGlobalEmail(request):
+     email = request.GET['email']
+     cpnm = "TransHub Corp. Ltd."
+     otp = generateOTP()
+     subject = 'Hello, Django Email!'
+     message = 'Here is Your OTP.'+otp
+     from_email = EMAIL_HOST_USER
+     recipient_list = [email] 
+     data = {
+          "exists": send_mail(subject, message, f"{cpnm} <{from_email}>", recipient_list),
+          "otp": otp
+     }
+     return JsonResponse(data)

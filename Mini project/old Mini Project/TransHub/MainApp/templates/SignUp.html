@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS for Background Image -->
+    <style>
+        body {
+            background-image: url({% static "MainApp/images/bus1.jpg" %}); /* Replace 'your-background-image.jpg' with the path to your background image */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .container {
+            padding: 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Register</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Registration Form -->
+                        <form action="" method="POST" onsubmit="return validateForm()">
+                            {% csrf_token %}
+                            <!-- Username -->
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" required onkeyup="validateUsername()">
+                                <span id="username-error" class="text-danger"></span>
+                            </div>
+                            <!-- Email -->
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required onkeyup="validateEmail()">
+                                <span id="email-error" class="text-danger"></span>
+                            </div>
+                            <!-- Phone Number -->
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="text" class="form-control" id="phone" name="phone" required onkeyup="validatePhone()">
+                                <small class="form-text text-muted">Format: +1234567890</small>
+                                <span id="phone-error" class="text-danger"></span>
+                            </div>
+                            <!-- Password -->
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required onkeyup="validatePassword()">
+                                <span id="password-error" class="text-danger"></span>
+                            </div>
+                            <!-- Confirm Password -->
+                            <div class="form-group">
+                                <label for="confirm_password">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required onkeyup="validateConfirmPassword()">
+                                <span id="confirm-password-error" class="text-danger"></span>
+                            <div class="card-footer">
+                                Already have an account? <a href="{% url 'login' %}">Sign in</a>
+                            
+                            </div>
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-primary btn-block">Register</button>
+                            </div>
+                        </form>
+                    </div>
+                
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- JavaScript Validation -->
+    <script>
+        
+
+        function validateUsername() {
+            // Validation logic for username
+            var username = document.getElementById("username").value;
+            var errorSpan = document.getElementById("username-error");
+
+            if (username.includes(" ")) {
+                errorSpan.textContent = "Username should not contain spaces.";
+            } else if (username.length >= 15) {
+                errorSpan.textContent = "Username should have a size less than 15 characters.";
+            } else {
+                 errorSpan.textContent = "";
+            }
+        }
+
+        function validateEmail() {
+            // Validation logic for email
+            var email = document.getElementById("email").value;
+            var errorSpan = document.getElementById("email-error");
+        
+            if (/\s/.test(email)) {
+                errorSpan.textContent = "Email should not contain spaces.";
+            } else if (!/@gmail\.com$/.test(email)) {
+                errorSpan.textContent = "Email should contain the '@' symbol and end with 'gmail.com'.";
+            } else {
+                errorSpan.textContent = "";
+            }
+        }        
+
+        function validatePhone() {
+            // Validation logic for phone number
+            var phone = document.getElementById("phone").value;
+            var errorSpan = document.getElementById("phone-error");
+        
+            if (!/^(\+91\d{10})$/.test(phone)) {
+                errorSpan.textContent = "Invalid phone number format. Please use the format: +91XXXXXXXXXX";
+            } else {
+                errorSpan.textContent = "";
+            }
+        }
+        
+                
+        function validatePassword() {
+            // Validation logic for password
+            var password = document.getElementById("password").value;
+            var errorSpan = document.getElementById("password-error");
+        
+            // Check for length
+            if (password.length < 6) {
+                errorSpan.textContent = "Password should have a length of at least 6 characters.";
+            } else if (!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/.test(password)) {
+                errorSpan.textContent = "Password should contain at least one special character.";
+            } else if (!/\d/.test(password)) {
+                errorSpan.textContent = "Password should contain at least one number.";
+            } else if (!/[A-Z]/.test(password)) {
+                errorSpan.textContent = "Password should contain at least one uppercase letter.";
+            } else if (!/[a-z]/.test(password)) {
+                errorSpan.textContent = "Password should contain at least one lowercase letter.";
+            } else {
+                errorSpan.textContent = "";
+            }
+        }
+        
+        
+        function validateConfirmPassword() {
+            // Validation logic for confirm password
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirm_password").value;
+            var errorSpan = document.getElementById("confirm-password-error");
+        
+            if (password !== confirmPassword) {
+                errorSpan.textContent = "Password and Confirm Password do not match.";
+            } else {
+                errorSpan.textContent = "";
+            }
+        }
+        
+
+        function validateForm() {
+            // You can add additional overall form validation logic here if needed.
+            // If any of the individual field validations fail, return false to prevent form submission.
+            // If everything is valid, return true to submit the form.
+            return true;
+        }
+    </script>
+</body>
+</html>

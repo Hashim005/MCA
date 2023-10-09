@@ -10,7 +10,7 @@
     <!-- Custom CSS for Background Image -->
     <style>
         body {
-            background-image: url({% static "MainApp/images/bus1.jpg" %}); /* Replace 'your-background-image.jpg' with the path to your background image */
+            background-image: url({% static "MainApp/images/bus1.jpg" %});
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
@@ -36,20 +36,26 @@
                             <!-- Username -->
                             <div class="form-group">
                                 <label for="username">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" required onkeyup="validateUsername()">
+                                <input type="text" class="form-control" id="username" name="username" required onkeyup="validateUsername()" >
                                 <span id="username-error" class="text-danger"></span>
                             </div>
                             <!-- Email -->
                             <div class="form-group">
                                 <label for="email">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required onkeyup="validateEmail()">
+                                <input type="email" class="form-control" id="email" name="email" required onkeyup="validateEmail()" onblur="sendOtp()">
                                 <span id="email-error" class="text-danger"></span>
+                            </div>
+                            <!-- OTP -->
+                            <div class="form-group" id="otp-container">
+                                <label for="otp">OTP</label>
+                                <input type="text" class="form-control" id="otp" name="otp" required onblur="validateOTP()">
+                                <span id="otp-error" class="text-danger"></span>
                             </div>
                             <!-- Phone Number -->
                             <div class="form-group">
                                 <label for="phone">Phone Number</label>
                                 <input type="text" class="form-control" id="phone" name="phone" required onkeyup="validatePhone()">
-                                <small class="form-text text-muted">Format: +1234567890</small>
+                                <small class="form-text text-muted">Format: +919123456789</small>
                                 <span id="phone-error" class="text-danger"></span>
                             </div>
                             <!-- Password -->
@@ -57,22 +63,21 @@
                                 <label for="password">Password</label>
                                 <input type="password" class="form-control" id="password" name="password" required onkeyup="validatePassword()">
                                 <span id="password-error" class="text-danger"></span>
+                                <input type="checkbox" onclick="togglePasswordVisibility()"> Show Password
                             </div>
                             <!-- Confirm Password -->
                             <div class="form-group">
                                 <label for="confirm_password">Confirm Password</label>
                                 <input type="password" class="form-control" id="confirm_password" name="confirm_password" required onkeyup="validateConfirmPassword()">
                                 <span id="confirm-password-error" class="text-danger"></span>
+                            </div>
                             <div class="card-footer">
                                 Already have an account? <a href="{% url 'login' %}">Sign in</a>
-                            
                             </div>
-                                <!-- Submit Button -->
-                                <button type="submit" class="btn btn-primary btn-block">Register</button>
-                            </div>
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary btn-block" id="sub_btn">Register</button>
                         </form>
                     </div>
-                
                 </div>
             </div>
         </div>
@@ -85,90 +90,141 @@
 
     <!-- JavaScript Validation -->
     <script>
-        
-
+        var generatedOTP = 0;
+        var allCorrect = 1;
+        $("#otp-container").hide();
         function validateUsername() {
-            // Validation logic for username
-            var username = document.getElementById("username").value;
-            var errorSpan = document.getElementById("username-error");
+            var usernameInput = document.getElementById("username");
+            var usernameError = document.getElementById("username-error");
+            var usernamePattern = /^[a-zA-Z][a-zA-Z0-9]*$/; // First character should be a letter, no spaces
 
-            if (username.includes(" ")) {
-                errorSpan.textContent = "Username should not contain spaces.";
-            } else if (username.length >= 15) {
-                errorSpan.textContent = "Username should have a size less than 15 characters.";
+            if (!usernamePattern.test(usernameInput.value)) {
+                usernameError.textContent = "Username should start with a letter and contain only letters and numbers.";
+                allCorrect = 0;
+                return false;
+            } else if (usernameInput.value.length > 15) {
+                usernameError.textContent = "Username should be no longer than 15 characters.";
+                allCorrect = 0;
+                return false;
             } else {
-                 errorSpan.textContent = "";
+                usernameError.textContent = "";
+                allCorrect = 1;
+                return true;
             }
+        }
+
+        function validateOTP(){
+            const otp = document.getElementById("otp").value;
+            const otpError = document.getElementById("otp-error");
+            const sub=document.getElementById("sub_btn");
+            if (otp != generatedOTP){
+                otpError.textContent = "OTP is Not Correct";
+                allCorrect = 0;
+                sub.disabled = true;
+            }else{
+                otpError.textContent = "";
+                allCorrect = 1;
+                sub.disabled = false;
+
+            }
+        }
+
+        function sendOtp(){
+            var emailInput = document.getElementById("email");
+            var emailError = document.getElementById("email-error");
+            fetch(`/validateGlobalEmail/?email=${emailInput.value}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.otp){
+                        emailError.classList = "text-success";
+                        emailError.textContent = "OTP is Send to Email, Please Enter it;";
+                        $("#otp-container").show();
+                        generatedOTP = data.otp;
+                        console.log(generatedOTP);
+                    }
+                })
+                .catch(error => {
+                    console.error('An error occurred:', error);
+                });
         }
 
         function validateEmail() {
-            // Validation logic for email
-            var email = document.getElementById("email").value;
-            var errorSpan = document.getElementById("email-error");
-        
-            if (/\s/.test(email)) {
-                errorSpan.textContent = "Email should not contain spaces.";
-            } else if (!/@gmail\.com$/.test(email)) {
-                errorSpan.textContent = "Email should contain the '@' symbol and end with 'gmail.com'.";
+            var emailInput = document.getElementById("email");
+            var emailError = document.getElementById("email-error");
+            var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Email format
+
+            if (!emailPattern.test(emailInput.value)) {
+                emailError.textContent = "Invalid email format.";
+                allCorrect = 0;
+                return false;
             } else {
-                errorSpan.textContent = "";
+                allCorrect = 1;
+                emailError.textContent = "";
+                return true;
             }
-        }        
+        }
 
         function validatePhone() {
-            // Validation logic for phone number
-            var phone = document.getElementById("phone").value;
-            var errorSpan = document.getElementById("phone-error");
-        
-            if (!/^(\+91\d{10})$/.test(phone)) {
-                errorSpan.textContent = "Invalid phone number format. Please use the format: +91XXXXXXXXXX";
+            var phoneInput = document.getElementById("phone");
+            var phoneError = document.getElementById("phone-error");
+            var phonePattern = /^\+91\d{10}$/; // Phone number format: +91 followed by 10 digits
+
+            if (!phonePattern.test(phoneInput.value)) {
+                phoneError.textContent = "Phone number should start with +91 and contain 10 digits.";
+                allCorrect = 0;
+                return false;
             } else {
-                errorSpan.textContent = "";
+                phoneError.textContent = "";
+                allCorrect = 1;
+                return true;
             }
         }
-        
-                
+
         function validatePassword() {
-            // Validation logic for password
-            var password = document.getElementById("password").value;
-            var errorSpan = document.getElementById("password-error");
-        
-            // Check for length
-            if (password.length < 6) {
-                errorSpan.textContent = "Password should have a length of at least 6 characters.";
-            } else if (!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/.test(password)) {
-                errorSpan.textContent = "Password should contain at least one special character.";
-            } else if (!/\d/.test(password)) {
-                errorSpan.textContent = "Password should contain at least one number.";
-            } else if (!/[A-Z]/.test(password)) {
-                errorSpan.textContent = "Password should contain at least one uppercase letter.";
-            } else if (!/[a-z]/.test(password)) {
-                errorSpan.textContent = "Password should contain at least one lowercase letter.";
+            var passwordInput = document.getElementById("password");
+            var passwordError = document.getElementById("password-error");
+            var passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%^&!])[A-Za-z\d@#$%^&!]{6,}$/; // Password requirements
+
+            if (!passwordPattern.test(passwordInput.value)) {
+                passwordError.textContent = "Password should contain at least 6 characters, including one uppercase letter, one lowercase letter, one digit, and one special character.";
+                allCorrect = 0;
+                return false;
             } else {
-                errorSpan.textContent = "";
+                passwordError.textContent = "";
+                allCorrect = 1;
+                return true;
             }
         }
-        
-        
+
         function validateConfirmPassword() {
-            // Validation logic for confirm password
-            var password = document.getElementById("password").value;
-            var confirmPassword = document.getElementById("confirm_password").value;
-            var errorSpan = document.getElementById("confirm-password-error");
-        
-            if (password !== confirmPassword) {
-                errorSpan.textContent = "Password and Confirm Password do not match.";
+            var confirmPasswordInput = document.getElementById("confirm_password");
+            var confirmPasswordError = document.getElementById("confirm-password-error");
+            var passwordInput = document.getElementById("password");
+
+            if (confirmPasswordInput.value !== passwordInput.value) {
+                confirmPasswordError.textContent = "Passwords do not match.";
+                allCorrect = 0;
+                return false;
             } else {
-                errorSpan.textContent = "";
+                confirmPasswordError.textContent = "";
+                var cr = validateUsername() + validateEmail() + validateOTP() + validatePassword() + validatePhone();
+                console.log(cr);
+                allCorrect = 1;
+                return true;
             }
         }
-        
+
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById("password");
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+            } else {
+                passwordInput.type = "password";
+            }
+        }
 
         function validateForm() {
-            // You can add additional overall form validation logic here if needed.
-            // If any of the individual field validations fail, return false to prevent form submission.
-            // If everything is valid, return true to submit the form.
-            return true;
+            console.log(cr);
         }
     </script>
 </body>

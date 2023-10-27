@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 0px;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #444;
+            color: #fff;
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav li {
+            padding: 10px 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #fff;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* Added this to extend the navigation bar to the footer */
+        nav {
+            height: 90%;
+            position: fixed;
+        }
+
+        table {
+            width: 70%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Reduce padding and font size for email cell */
+        td:nth-child(2) {
+            padding: 8px; /* Adjust the padding size as needed */
+            font-size: 14px; /* Adjust the font size as needed */
+        }
+
+        .filter-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        select {
+            padding: 8px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Admin Dashboard</h1>
+        <p>Welcome, Admin Name</p>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">User Management</a></li>
+            <li><a href="#">Bookings</a></li>
+            <li><a href="#">Real-Time Tracking</a></li>
+            <li><a href="#">Reports</a></li>
+            <li><a href="#">Settings</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h1>User Table</h1>
+        <div class="filter-container">
+            <select id="roleFilter">
+                <option value="">All Roles</option>
+                <option value="Admin">Admin</option>
+                <option value="Staff">Staff</option>
+                <option value="User">User</option>
+            </select>
+            <button id="filterButton">Filter</button>
+        </div>
+        <table>
+            <tr>
+                <th>Username</th>
+                <th>Email ID</th>
+                <th>Phone Number</th>
+            </tr>
+            <tr>
+                <td>JohnDoe</td>
+                <td>johndoe@example.com</td>
+                <td>(123) 456-7890</td>
+            </tr>
+            <tr>
+                <td>JaneSmith</td>
+                <td>janesmith@example.com</td>
+                <td>(987) 654-3210</td>
+            </tr>
+            <!-- Add more rows as needed without the "Role" field -->
+        </table>
+        <script>
+            const roleFilter = document.getElementById('roleFilter');
+            const filterButton = document.getElementById('filterButton');
+            const rows = document.querySelectorAll('table tr');
+    
+            filterButton.addEventListener('click', () => {
+                const selectedRole = roleFilter.value;
+                rows.forEach(row => {
+                    if (selectedRole === '' || row.textContent.includes(selectedRole)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        </script>
+    </main>
+    <footer>
+        <p>&copy; 2023 E-Transport System</p>
+    </footer>
+</body>
+</html>

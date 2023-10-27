@@ -26,10 +26,11 @@ def SignUp(request):
             phone = request.POST.get('phone')
             password = request.POST['password']
             confirm_password = request.POST['confirm_password']
+            role='user'
             
             if password != confirm_password:
                  return render(request, SignUp.html)
-            user = Users(username=username,phone_number=phone, email=email)
+            user = Users(username=username,phone_number=phone, email=email,role=role)
             # password set
             user.set_password(password)
             #save the user to database
@@ -82,3 +83,39 @@ def validateGlobalEmail(request):
           "otp": otp
      }
      return JsonResponse(data)
+
+def check_username(request):
+     username = request.GET.get('username', '')
+     user_exits = Users.objects.filter(username=username).exists()
+     return JsonResponse({'exists': user_exits})
+
+def check_email(request):
+     email = request.GET.get('email', '').lower
+     email_exists = Users.objects.filter(email=email).exists()
+     return JsonResponse({'exists': email_exists})
+
+def Staff_signUp(request):
+    if request.method == 'POST':
+        # Similar to the SignUp view, include the role field
+        username = request.POST['username']
+        email = request.POST['email']
+        phone = request.POST.get('phone')
+        password = request.POST['password']
+        confirm_password = request.POST['confirm_password']
+        role = 'Staff'  # Set the role to 'staff' for staff registration
+
+        if password != confirm_password:
+            return render(request, 'StaffSignUp.html')
+
+        user = Users(username=username, phone_number=phone, email=email, role=role)
+        user.set_password(password)
+        user.save()
+        return redirect('login')
+
+    return render(request, 'StaffSignUp.html')
+
+def Admin_Home(request):
+     return render(request, 'adminhome.html')
+
+def user_account(request):
+     return render(request, 'usertable.html')

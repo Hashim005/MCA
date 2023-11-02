@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -67,7 +68,7 @@
         }
 
         table {
-            width: 70%;
+            width: 60%;
             border-collapse: collapse;
         }
 
@@ -126,50 +127,91 @@
         </ul>
     </nav>
     <main>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
         <h1>User Table</h1>
+        <form action="{% url 'user_account' %}" method="GET">
         <div class="filter-container">
-            <select id="roleFilter">
+            <select id="roleFilter" name="role">
                 <option value="">All Roles</option>
-                <option value="Admin">Admin</option>
-                <option value="Staff">Staff</option>
-                <option value="User">User</option>
+                <option value="Admin" {% if role_filter == 'Admin' %}selected{% endif %}>Admin</option>
+                <option value="Staff" {% if role_filter == 'Staff' %}selected{% endif %}>Staff</option>
+                <option value="user" {% if role_filter == 'user' %}selected{% endif %}>User</option>
             </select>
-            <button id="filterButton">Filter</button>
+            
+            
+            
+            <button id="filterButton" type="submit">Filter</button>
+        </form>
         </div>
         <table>
             <tr>
                 <th>Username</th>
                 <th>Email ID</th>
                 <th>Phone Number</th>
+                <th>Activate</th>
+                <th>Deactivate</th>
             </tr>
-            <tr>
-                <td>JohnDoe</td>
-                <td>johndoe@example.com</td>
-                <td>(123) 456-7890</td>
-            </tr>
-            <tr>
-                <td>JaneSmith</td>
-                <td>janesmith@example.com</td>
-                <td>(987) 654-3210</td>
-            </tr>
+            <tbody>
+                {% for Users in User_profiles %}
+                    {% if not Users.is_superuser %}
+                        <tr>
+                            <td>{{ Users.username }}</td>
+                            <td>{{ Users.email }}</td>
+                            <td>{{ Users.phone_number }}</td>
+                            <td>{{ Users.is_active}}</td>
+                            <td>
+                                {% if Users.is_active %}
+                                    <form method="post" action="{% url 'deactivate_user' Users.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit">Deactivate</button>
+                                    </form>
+                                {% else %}
+                                    <form method="post" action="{% url 'activate_user' Users.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit">Activate</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if Users.role != "Admin" %}
+                                    
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
             <!-- Add more rows as needed without the "Role" field -->
         </table>
-        <script>
-            const roleFilter = document.getElementById('roleFilter');
-            const filterButton = document.getElementById('filterButton');
-            const rows = document.querySelectorAll('table tr');
-    
-            filterButton.addEventListener('click', () => {
-                const selectedRole = roleFilter.value;
-                rows.forEach(row => {
-                    if (selectedRole === '' || row.textContent.includes(selectedRole)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js">
+        
+            $(document).ready(function () {
+                const roleFilter = $('#roleFilter');
+                const rows = $('table tbody tr');
+        
+                roleFilter.on('change', function () {
+                    const selectedRole = roleFilter.val();
+                    rows.each(function () {
+                        const roleCell = $(this).find('td').eq(2); // Index 2 is the position of the "Role" cell
+                        const userRole = roleCell.text().trim();
+                        
+                        if (selectedRole === '' || userRole === selectedRole) {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
                 });
             });
         </script>
+        
+    
     </main>
     <footer>
         <p>&copy; 2023 E-Transport System</p>

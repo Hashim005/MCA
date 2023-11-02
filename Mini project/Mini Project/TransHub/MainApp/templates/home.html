@@ -47,11 +47,13 @@
 
 						<div class="user_box ml-auto">
 							<div class="user_box_login user_box_link"><a href='{% url 'logout' %}' id='logout_id'>logout</a></div>
+							<div class="user_box_login user_box_link"><a href='{% url 'update_profile' %}' id='profile_id'>Profile</a></div>
 						</div>
 						{% else %}
 						<div class="user_box ml-auto">
 							<div class="user_box_login user_box_link"><a href='login'>login</a></div>
 							<div class="user_box_register user_box_link"><a href="SignUp">Sign Up</a></div>
+
 						</div>
 
 						{% endif %}

@@ -19,4 +19,14 @@ urlpatterns = [
     path('StaffSignUp/', views.Staff_signUp, name='Staff_signUp'),
     path('adminhome/', views.Admin_Home, name='Admin_Home'),
     path('adminusertable/', views.user_account, name='user_account'),
+
+    path('deactivate_user/<int:user_id>/', views.deactivate_user, name='deactivate_user'),
+    path('activate_user/<int:user_id>/', views.activate_user, name='activate_user'),  
+    
+    #path('activate/<uidb64>/<token>',views.ActivateAccount.as_view(),name='activate'),
+    path('deactivation_email/',views.activatation_email,name='activatation_email'),
+    path('activation_email/',views.deactivation_email,name='deactivation_email'),
+
+    path('update_profile/',views.update_profile,name='update_profile'),
+    path('profile/',views.profile,name='profile'),
 ]

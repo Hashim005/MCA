@@ -29,4 +29,10 @@ urlpatterns = [
 
     path('update_profile/',views.update_profile,name='update_profile'),
     path('profile/',views.profile,name='profile'),
+    path('category/',views.category_mgt,name='category-page'),
+    path('save_category/',views.save_category,name='save-category'),
+    path('manage-category', views.manage_category, name='manage-category'),
+    path('manage-category/<int:pk>/', views.manage_category, name='manage-category'),
+    path('delete_category',views.delete_category,name='delete-category'),
+
 ]

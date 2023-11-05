@@ -1,11 +1,12 @@
 from collections import UserDict
+import json
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
-from .models import Users
+from .models import Category, Users
 from TransHub.settings import EMAIL_HOST_USER
 from .models import Users
 from django.core.mail import send_mail
@@ -200,7 +201,7 @@ def deactivation_email(request):
 # views.py
 # views.py
 from django.shortcuts import render, redirect
-from .forms import UserProfileForm, AdditionalProfileForm
+from .forms import SaveCategory, UserProfileForm, AdditionalProfileForm
 
 def update_profile(request):
     # Check if the UserProfile exists for the user, and create it if it doesn't
@@ -227,5 +228,77 @@ def update_profile(request):
 
 def profile(request):
     return render(request, 'profile.html')
+
+#context text
+context = {
+    'page_title' : 'File Management System',
+}
+
+#category
+@login_required
+def category_mgt(request):
+    context['page_title'] = "Bus Categories"
+    categories = Category.objects.all()
+    context['categories'] = categories
+
+    return render(request, 'category_mgt.html', context)
+
+#save_category
+@login_required
+def save_category(request):
+    resp = {'status':'failed','msg':''}
+    if request.method == 'POST':
+        if (request.POST['id']).isnumeric():
+            category = Category.objects.get(pk=request.POST['id'])
+        else:
+            category = None
+        if category is None:
+            form = SaveCategory(request.POST)
+        else:
+            form = SaveCategory(request.POST, instance= category)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Category has been saved successfully.')
+            resp['status'] = 'success'
+        else:
+            for fields in form:
+                for error in fields.errors:
+                    resp['msg'] += str(error + "<br>")
+    else:
+        resp['msg'] = 'No data has been sent.'
+    return HttpResponse(json.dumps(resp), content_type = 'application/json')
+
+#manage_category
+@login_required
+def manage_category(request, pk=None):
+    context['page_title'] = "Manage Category"
+    if not pk is None:
+        category = Category.objects.get(id = pk)
+        context['category'] = category
+    else:
+        context['category'] = {}
+
+    return render(request, 'manage_category.html', context)
+
+#delete_category
+@login_required
+def delete_category(request):
+    resp = {'status':'failed', 'msg':''}
+
+    if request.method == 'POST':
+        try:
+            category = Category.objects.get(id = request.POST['id'])
+            category.delete()
+            messages.success(request, 'Category has been deleted successfully')
+            resp['status'] = 'success'
+        except Exception as err:
+            resp['msg'] = 'Category has failed to delete'
+            print(err)
+
+    else:
+        resp['msg'] = 'Category has failed to delete'
+    
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
 
 

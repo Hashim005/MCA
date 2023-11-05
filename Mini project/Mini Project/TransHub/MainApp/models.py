@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 
 class Users(AbstractUser):
@@ -24,4 +25,14 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+class Category(models.Model):
+    name = models.CharField(max_length=250)
+    description = models.TextField()
+    status = models.CharField(max_length=2, choices=(('1', 'Active'), ('2', 'Inactive')), default=1)
+    date_created = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
     

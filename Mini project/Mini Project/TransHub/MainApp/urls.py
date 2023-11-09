@@ -34,5 +34,15 @@ urlpatterns = [
     path('manage-category', views.manage_category, name='manage-category'),
     path('manage-category/<int:pk>/', views.manage_category, name='manage-category'),
     path('delete_category',views.delete_category,name='delete-category'),
-
+    path('location',views.location_mgt,name='location-page'),
+    path('manage_location',views.manage_location,name='manage-location'),
+    path('save_location',views.save_location,name='save-location'),
+    path('manage_location/<int:pk>',views.manage_location,name='manage-location-pk'),
+    path('delete_location',views.delete_location,name='delete-location'),
+    path('bus',views.bus_mgt,name='bus-page'),
+    path('manage_bus',views.manage_bus,name='manage-bus'),
+    path('save_bus',views.save_bus,name='save-bus'),
+    path('manage_bus/<int:pk>',views.manage_bus,name='manage-bus-pk'),
+    path('delete_bus',views.delete_bus,name='delete-bus'),
+    path('find_trip',views.find_trip,name='find-trip-page'),
 ]

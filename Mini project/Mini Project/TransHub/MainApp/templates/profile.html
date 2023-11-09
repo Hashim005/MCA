@@ -1,27 +1,53 @@
-<!-- profile.html -->
 <!DOCTYPE html>
 <html>
 <head>
     <title>Profile</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f0f0f0; /* Stylish background color */
+        }
+        .circular-image {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+        .profile-card {
+            background-color: rgba(135, 206, 235, 0.7);
+            padding: 20px;
+            text-align: center;
+            margin: 50px auto;
+        }
+        .profile-card p {
+            margin-top: 10px;
+            font-size: 18px; /* Increased font size for better readability */
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="my-4">Your Profile</h1>
-        <div class="card">
-            <div class="card-body">
-                <p class="card-text">Username: {{ request.user.username }}</p>
-                <p class="card-text">Email: {{ request.user.email }}</p>
-                <p class="card-text">Phone Number: {{ request.user.phone_number }}</p>
-                <p class="card-text">Age: {{ request.user.userprofile.age }}</p>
-                <p class="card-text">Gender: {{ request.user.userprofile.gender }}</p>
-                <p class="card-text">City: {{ request.user.userprofile.city }}</p>
-                <p class="card-text">Date of Birth: {{ request.user.userprofile.date_of_birth }}</p>
-                {% if request.user.userprofile.profile_picture %}
-                <img src="{{ request.user.userprofile.profile_picture.url }}" alt="Profile Picture" class="img-fluid">
-                {% else %}
-                <p class="card-text">No profile picture uploaded.</p>
-                {% endif %}
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="profile-card">
+                    <h1 class="my-4">Profile</h1>
+                    <div class="text-center">
+                        {% if request.user.userprofile.profile_picture %}
+                            <img src="{{ request.user.userprofile.profile_picture.url }}" alt="Profile Picture" class="circular-image img-fluid">
+                        {% else %}
+                            <p class="card-text">No profile picture uploaded.</p>
+                        {% endif %}
+                    </div>
+                    <div class="text-left">
+                        <p><strong>Username:</strong> {{ request.user.username }}</p>
+                        <p><strong>Email:</strong> {{ request.user.email }}</p>
+                        <p><strong>Phone Number:</strong> {{ request.user.phone_number }}</p>
+                        <p><strong>Age:</strong> {{ request.user.userprofile.age }}</p>
+                        <p><strong>Gender:</strong> {{ request.user.userprofile.gender }}</p>
+                        <p><strong>City:</strong> {{ request.user.userprofile.city }}</p>
+                        <p><strong>Date of Birth:</strong> {{ request.user.userprofile.date_of_birth }}</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

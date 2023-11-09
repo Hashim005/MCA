@@ -35,4 +35,24 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+class Location(models.Model):
+    location = models.CharField(max_length=250)
+    status = models.CharField(max_length=2, choices=(('1','Active'),('2','Inactive')), default=1)
+    date_created = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.location
     
+class Bus(models.Model):
+    category = models.ForeignKey(Category,on_delete=models.CASCADE, blank= True, null = True)
+    bus_number = models.CharField(max_length=250)
+    seats = models.FloatField(max_length=5, default=0)
+    status = models.CharField(max_length=2, choices=(('1','Active'),('2','Inactive')), default=1)
+    date_created = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.bus_number
+

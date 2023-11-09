@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bus & Truck Booking</title>
+    <!-- Add Bootstrap CSS link -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .exchange-icon {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .form-group {
+            margin-right: 10px;
+        }
+        .form-group input {
+            width: 200px; /* Adjust the width as needed */
+        }
+        .form-group label {
+            font-size: 18px; /* Adjust the font size as needed */
+        }
+        body {
+            background-image: url('bus.jpg');
+            background-size: cover;
+        }
+        /* Custom CSS for the navbar */
+        .navbar {
+            background-color: #FFC0CB; /* Light red color */
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <a class="navbar-brand" href="#">Bus & Truck Booking</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Cancellation</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Feedback</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Status Check</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Login/Signup</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content in the center -->
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="text-center">User Booking</h1>
+            <form class="d-flex">
+                <div class="form-group">
+                    <label for="source">Starting Point</label>
+                    <input type="text" class="form-control" id="source" placeholder="Search Starting Point">
+                </div>
+                <div class="form-group exchange-icon" onclick="exchangeValues()">
+                    ⇆
+                </div>
+                <div class="form-group">
+                    <label for="destination">Destination</label>
+                    <input type="text" class="form-control" id="destination" placeholder="Search Destination">
+                </div>
+                <div class="form-group">
+                    <label for="journeyDate">Journey Date</label>
+                    <input type="date" class="form-control" id="journeyDate">
+                </div>
+                <div class="form-group">
+                    <label for="returnDate">Return Date (Optional)</label>
+                    <input type="date" class="form-control" id="returnDate">
+                </div>
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Bootstrap JS and jQuery script links here -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    function exchangeValues() {
+        var sourceValue = document.getElementById("source").value;
+        var destinationValue = document.getElementById("destination").value;
+        document.getElementById("source").value = destinationValue;
+        document.getElementById("destination").value = sourceValue;
+    }
+</script>
+
+</body>
+</html>

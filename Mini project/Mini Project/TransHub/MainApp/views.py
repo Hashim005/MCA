@@ -1,12 +1,14 @@
 from collections import UserDict
+import datetime
 import json
+from django.forms import ValidationError
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
-from .models import Category, Users
+from .models import Bus, Category, Location, Users
 from TransHub.settings import EMAIL_HOST_USER
 from .models import Users
 from django.core.mail import send_mail
@@ -55,15 +57,14 @@ def Log(request):
     if request.method == "POST":
          username = request.POST['username']
          user_password = request.POST['password']
-         if username == "admin" and user_password == "admin":
-              request.session['username'] = username
-              return redirect("Admin_Home")
-         
          user = authenticate(username=username, password=user_password)
-         
          if user is not None:
-              login(request, user)
-              return redirect('Home')
+            if user.is_superuser:
+                login(request, user)
+                request.session['username'] = username
+                return redirect("Admin_Home")
+            login(request, user)
+            return redirect('Home')
          else:
               return render(request, 'login.html', {'Error_message': 'invalid creadential!!'})
     
@@ -131,6 +132,8 @@ def Staff_signUp(request):
     return render(request, 'StaffSignUp.html')
 
 def Admin_Home(request):
+     if not request.user.is_authenticated:
+         return redirect ('login')
      return render(request, 'adminhome.html')
 
 def user_account(request):
@@ -201,7 +204,7 @@ def deactivation_email(request):
 # views.py
 # views.py
 from django.shortcuts import render, redirect
-from .forms import SaveCategory, UserProfileForm, AdditionalProfileForm
+from .forms import SaveBus, SaveCategory, SaveLocation, UserProfileForm, AdditionalProfileForm
 
 def update_profile(request):
     # Check if the UserProfile exists for the user, and create it if it doesn't
@@ -299,6 +302,143 @@ def delete_category(request):
         resp['msg'] = 'Category has failed to delete'
     
     return HttpResponse(json.dumps(resp), content_type="application/json")
+
+# Location
+@login_required
+def location_mgt(request):
+    context['page_title'] = "Locations"
+    locations = Location.objects.all()
+    context['locations'] = locations
+
+    return render(request, 'location_mgt.html', context)
+
+#save location
+@login_required
+def save_location(request):
+    resp = {'status':'failed','msg':''}
+    if request.method == 'POST':
+        if (request.POST['id']).isnumeric():
+            location = Location.objects.get(pk=request.POST['id'])
+        else:
+            location = None
+        if location is None:
+            form = SaveLocation(request.POST)
+        else:
+            form = SaveLocation(request.POST, instance= location)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Location has been saved successfully.')
+            resp['status'] = 'success'
+        else:
+            for fields in form:
+                for error in fields.errors:
+                    resp['msg'] += str(error + "<br>")
+    else:
+        resp['msg'] = 'No data has been sent.'
+    return HttpResponse(json.dumps(resp), content_type = 'application/json')
+
+#manage location
+@login_required
+def manage_location(request, pk=None):
+    context['page_title'] = "Manage Location"
+    if not pk is None:
+        location = Location.objects.get(id = pk)
+        context['location'] = location
+    else:
+        context['location'] = {}
+
+    return render(request, 'manage_location.html', context)
+
+#delete location
+@login_required 
+def delete_location(request):
+    resp = {'status':'failed', 'msg':''}
+
+    if request.method == 'POST':
+        try:
+            location = Location.objects.get(id = request.POST['id'])
+            location.delete()
+            messages.success(request, 'Location has been deleted successfully')
+            resp['status'] = 'success'
+        except Exception as err:
+            resp['msg'] = 'location has failed to delete'
+            print(err)
+
+    else:
+        resp['msg'] = 'location has failed to delete'
+    
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+@login_required
+def bus_mgt(request):
+    context['page_title'] = "Buses"
+    buses = Bus.objects.all()
+    context['buses'] = buses
+
+    return render(request, 'bus_mgt.html', context)
+
+@login_required
+def save_bus(request):
+    print("hello")
+    resp = {'status':'failed','msg':''}
+    if request.method == 'POST':
+        
+        if (request.POST['id']).isnumeric():
+            bus = Bus.objects.get(pk=request.POST['id'])
+            
+        else:
+            bus = None
+        if bus is None:
+            form = SaveBus(request.POST)
+        else:
+            form = SaveBus(request.POST, instance= bus)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Bus has been saved successfully.')
+            resp['status'] = 'success'
+        else:
+            for fields in form:
+                for error in fields.errors:
+                    resp['msg'] += str(error + "<br>")
+    else:
+        resp['msg'] = 'No data has been sent.'
+    return HttpResponse(json.dumps(resp), content_type = 'application/json')
+
+@login_required
+def manage_bus(request, pk=None):
+    print("Manage")
+    context['page_title'] = "Manage Bus"
+    categories = Category.objects.filter(status = 1).all()
+    context['categories'] = categories
+    if not pk is None:
+        bus = Bus.objects.get(id = pk)
+        context['bus'] = bus
+    else:
+        context['bus'] = {}
+
+    return render(request, 'manage_bus.html', context)
+
+@login_required
+def delete_bus(request):
+    resp = {'status':'failed', 'msg':''}
+
+    if request.method == 'POST':
+        try:
+            bus = Bus.objects.get(id = request.POST['id'])
+            bus.delete()
+            messages.success(request, 'Bus has been deleted successfully')
+            resp['status'] = 'success'
+        except Exception as err:
+            resp['msg'] = 'bus has failed to delete'
+            print(err)
+
+    else:
+        resp['msg'] = 'bus has failed to delete'
+    
+    return HttpResponse(json.dumps(resp), content_type="application/json")    
+
+def find_trip(request):
+   return render(request, find_trip.html)
 
 
 

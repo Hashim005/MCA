@@ -1,20 +1,19 @@
 from collections import UserDict
-import datetime
 import json
-from django.forms import ValidationError
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
-from .models import Bus, Category, Location, Users
+from .models import Bus, Category, Location, Schedule, Users
 from TransHub.settings import EMAIL_HOST_USER
 from .models import Users
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.contrib import messages
 from .models import Users, UserProfile
+from datetime import datetime
 
 # from django.http import HttpResponse
 
@@ -204,7 +203,7 @@ def deactivation_email(request):
 # views.py
 # views.py
 from django.shortcuts import render, redirect
-from .forms import SaveBus, SaveCategory, SaveLocation, UserProfileForm, AdditionalProfileForm
+from .forms import SaveBus, SaveCategory, SaveLocation, SaveSchedule, UserProfileForm, AdditionalProfileForm
 
 def update_profile(request):
     # Check if the UserProfile exists for the user, and create it if it doesn't
@@ -369,23 +368,21 @@ def delete_location(request):
     
     return HttpResponse(json.dumps(resp), content_type="application/json")
 
+# bus
 @login_required
 def bus_mgt(request):
     context['page_title'] = "Buses"
     buses = Bus.objects.all()
     context['buses'] = buses
 
-    return render(request, 'bus_mgt.html', context)
+    return render(request, 'bus_mgt.html', context) 
 
 @login_required
 def save_bus(request):
-    print("hello")
     resp = {'status':'failed','msg':''}
     if request.method == 'POST':
-        
         if (request.POST['id']).isnumeric():
             bus = Bus.objects.get(pk=request.POST['id'])
-            
         else:
             bus = None
         if bus is None:
@@ -406,7 +403,6 @@ def save_bus(request):
 
 @login_required
 def manage_bus(request, pk=None):
-    print("Manage")
     context['page_title'] = "Manage Bus"
     categories = Category.objects.filter(status = 1).all()
     context['categories'] = categories
@@ -435,10 +431,226 @@ def delete_bus(request):
     else:
         resp['msg'] = 'bus has failed to delete'
     
-    return HttpResponse(json.dumps(resp), content_type="application/json")    
+    return HttpResponse(json.dumps(resp), content_type="application/json")
+
+# schedule
+@login_required
+def schedule_mgt(request):
+    context['page_title'] = "Trip Schedules"
+    schedules = Schedule.objects.all()
+    context['schedules'] = schedules
+
+    return render(request, 'schedule_mgt.html', context)
+
+@login_required
+def save_schedule(request):
+    resp = {'status':'failed','msg':''}
+    if request.method == 'POST':
+        if (request.POST['id']).isnumeric():
+            schedule = Schedule.objects.get(pk=request.POST['id'])
+        else:
+            schedule = None
+        if schedule is None:
+            form = SaveSchedule(request.POST)
+        else:
+            form = SaveSchedule(request.POST, instance= schedule)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Schedule has been saved successfully.')
+            resp['status'] = 'success'
+        else:
+            for fields in form:
+                for error in fields.errors:
+                    resp['msg'] += str(error + "<br>")
+    else:
+        resp['msg'] = 'No data has been sent.'
+    return HttpResponse(json.dumps(resp), content_type = 'application/json')
+
+@login_required
+def manage_schedule(request, pk=None):
+    context['page_title'] = "Manage Schedule"
+    buses = Bus.objects.filter(status = 1).all()
+    locations = Location.objects.filter(status = 1).all()
+    context['buses'] = buses
+    context['locations'] = locations
+    if not pk is None:
+        schedule = Schedule.objects.get(id = pk)
+        context['schedule'] = schedule
+    else:
+        context['schedule'] = {}
+
+    return render(request, 'manage_schedule.html', context)
+
+@login_required
+def delete_schedule(request):
+    resp = {'status':'failed', 'msg':''}
+
+    if request.method == 'POST':
+        try:
+            schedule = Schedule.objects.get(id = request.POST['id'])
+            schedule.delete()
+            messages.success(request, 'Schedule has been deleted successfully')
+            resp['status'] = 'success'
+        except Exception as err:
+            resp['msg'] = 'schedule has failed to delete'
+            print(err)
+
+    else:
+        resp['msg'] = 'Schedule has failed to delete'
+    
+    return HttpResponse(json.dumps(resp), content_type="application/json") 
+
+
+class Seat:
+    def __init__(self, number, is_reserved, is_women_seat):
+        self.number = number
+        self.is_reserved = is_reserved
+        self.is_women_seat = is_women_seat
+
+def bus_seat_map(request):
+    # Example: Creating a list of 40 seats with alternating reserved and available status,
+    # and 5 women seats
+    num_seats = 40
+    num_women_seats = 5
+    seats = [Seat(number=i, is_reserved=i % 2 == 0, is_women_seat=i < num_women_seats) for i in range(1, num_seats + 1)]
+
+    return render(request, 'bus_grid_seat.html', {'seats': seats})
+
+def book_seat(request):
+    if request.method == 'POST':
+        selected_seats = request.POST.getlist('selected_seats')
+        # Handle booking logic here
+        return HttpResponse(f'Selected Seats: {", ".join(selected_seats)}')
+    else:
+        return HttpResponse('Invalid request method')
+
+
+# find trip set
+
+from django.shortcuts import render
+from django.http import Http404
+from datetime import datetime
+from .models import Location, Schedule
+
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from datetime import datetime
+from .models import Schedule, Location
 
 def find_trip(request):
-   return render(request, find_trip.html)
+    context = {}
+    context['page_title'] = 'Find Trip Schedule'
+    context['locations'] = Location.objects.filter(status=1).all()
+    today = datetime.today().strftime("%Y-%m-%d")
+    context['today'] = today
+
+    if request.method == 'GET':
+        depart = request.GET.get('depart')
+        destination = request.GET.get('destination')
+        journey_date = request.GET.get('journeyDate')
+        return_date = request.GET.get('returnDate')
+
+        # Basic input validation
+        if not depart and not destination and not journey_date:
+            context['error_message'] = 'Please provide at least one search parameter.'
+            return render(request, 'find_trip.html', context)
+
+        # Additional validation can be added here if needed
+
+        # Validate depart and destination locations
+        try:
+            depart_location = Location.objects.get(pk=depart)
+        except Location.DoesNotExist:
+            raise Http404('Depart location does not exist')
+
+        try:
+            destination_location = Location.objects.get(pk=destination)
+        except Location.DoesNotExist:
+            raise Http404('Destination location does not exist')
+
+        # Filter schedules based on the user's search parameters
+        schedules = Schedule.objects.all()
+
+        if depart:
+            schedules = schedules.filter(depart__location__icontains=depart_location)
+        if destination:
+            schedules = schedules.filter(destination__location__icontains=destination_location)
+        if journey_date:
+            # Validate journey_date format (YYYY-MM-DD)
+            try:
+                journey_date = datetime.strptime(journey_date, '%Y-%m-%d').date()
+            except ValueError:
+                context['error_message'] = 'Invalid journey date format.'
+                return render(request, 'find_trip.html', context)
+
+            # Filter schedules for the selected journey_date
+            schedules = schedules.filter(schedule__date__contains=journey_date)
+
+        context['schedules'] = schedules
+
+        # Redirect to schedule_view_page with the search parameters, but only if journey_date is provided
+        if journey_date:
+            return redirect(reverse('schedule_view_page') + f'?journeyDate={journey_date}')
+
+    return render(request, 'find_trip.html', context)
+
+def schedule_view_page(request):
+    context = {}
+
+    if request.method == 'GET': 
+        depart = request.GET.get('depart')
+        destination = request.GET.get('destination')
+        journey_date = request.GET.get('journeyDate')
+
+        # Additional validation can be added here if needed
+
+        # Filter schedules based on the user's search parameters
+        schedules = Schedule.objects.all()
+
+        if depart:
+            schedules = schedules.filter(depart__location__icontains=depart)
+
+        if destination:
+            schedules = schedules.filter(destination__location__icontains=destination)
+
+        if journey_date:
+            # Filter schedules for the selected journey_date
+            schedules = schedules.filter(schedule__date__contains=journey_date)
+
+        # Create a dictionary to store unique buses based on bus_number
+        unique_buses = {}
+
+        # Iterate through schedules and keep only the first occurrence of each bus
+        for schedule in schedules:
+            bus_number = schedule.bus.bus_number
+            if bus_number not in unique_buses:
+                unique_buses[bus_number] = schedule
+
+        # Extract the unique schedules from the dictionary
+        unique_schedules = list(unique_buses.values())
+
+        context['schedules'] = unique_schedules
+
+    return render(request, 'schedule_view_page.html', context)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
 
 
 

@@ -44,5 +44,14 @@ urlpatterns = [
     path('save_bus',views.save_bus,name='save-bus'),
     path('manage_bus/<int:pk>',views.manage_bus,name='manage-bus-pk'),
     path('delete_bus',views.delete_bus,name='delete-bus'),
-    path('find_trip',views.find_trip,name='find-trip-page'),
+    path('schedule',views.schedule_mgt,name='schedule-page'),
+    path('manage_schedule',views.manage_schedule,name='manage-schedule'),
+    path('save_schedule',views.save_schedule,name='save-schedule'),
+    path('manage_schedule/<int:pk>',views.manage_schedule,name='manage-schedule-pk'),
+    path('delete_schedule',views.delete_schedule,name='delete-schedule'),
+    path('bus-seat-map/', views.bus_seat_map, name='bus_seat_map'),
+    path('book-seat/', views.book_seat, name='book_seat'),
+    path('find_trip/',views.find_trip,name='find_trip'),
+    path('schedule_view_page/', views.schedule_view_page, name='schedule_view_page'),
+
 ]

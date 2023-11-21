@@ -56,12 +56,17 @@
       height: calc(2.25rem + 2px);
     }
 
+    /* Hide error messages initially */
+    .form-text.text-danger {
+      display: none;
+    }
+
   </style>
 </head>
 <body>
 
 <div class="container search_panel">
-  <form action="#" id="search_form_2" class="search_panel_content d-flex flex-wrap justify-content-between align-items-center">
+  <form action="{% url "schedule_view_page" %}" id="search_form_2" class="search_panel_content d-flex flex-wrap justify-content-between align-items-center">
     {% csrf_token %}
     <div class="search_item">
       <label for="depart">Depart</label>
@@ -71,28 +76,30 @@
         <option value="{{ location.id }}">{{ location }}</option>
         {% endfor %}
       </select>
+      <span id="departError" class="form-text text-danger">Please select a location</span>
     </div>
     <div class="search_item">
-      <label for="destination">Depart</label>
+      <label for="destination">Destination</label>
       <select name="destination" id="destination" class="form-select select2 rounded-0">
         <option selected></option>
         {% for location in locations %}
         <option value="{{ location.id }}">{{ location }}</option>
         {% endfor %}
       </select>
+      <span id="destinationError" class="form-text text-danger">Please select a location</span>
     </div>
     <div class="search_item">
       <label for="journeyDate">Journey Date</label>
       <input type="date" id="journeyDate" class="check_in search_input form-control" min="{{ today }}" required="required">
-      <small id="journeyDateHelp" class="form-text text-danger"></small>
+      <span id="journeyDateHelp" class="form-text text-danger">Invalid journey date</span>
     </div>
     <div class="search_item">
       <label for="returnDate">Return Date (optional)</label>
       <input type="date" id="returnDate" class="check_out search_input form-control" min="{{ today }}">
-      <small id="returnDateHelp" class="form-text text-danger"></small>
+      <span id="returnDateHelp" class="form-text text-danger">Invalid return date</span>
     </div>
 
-    <a href="{% url 'schedule_view_page' %}?journeyDate={{ journey_date }}" class="btn btn-primary search_button">Search</a>
+    <button type="submit" class="btn btn-primary search_button">Search</button>
   </form>
 </div>
 
@@ -133,32 +140,99 @@
     // Change the background image every 5 seconds (adjust as needed)
     setInterval(changeBackground, 5000);
 
-    // Validate date fields
+    // Hide error messages initially
+    $('.form-text.text-danger').hide();
+
+    // Show error messages only on user interaction
+    $('#depart').change(function() {
+      validateDepart();
+      validateSameLocation();
+    });
+
+    $('#destination').change(function() {
+      validateDestination();
+      validateSameLocation();
+    });
+
     $('#journeyDate').change(function() {
-      validateDates();
+      validateJourneyDate();
     });
 
     $('#returnDate').change(function() {
-      validateDates();
+      validateReturnDate();
     });
 
-    function validateDates() {
-      var journeyDate = new Date($('#journeyDate').val());
-      var returnDate = new Date($('#returnDate').val());
+    // Validate form before submission
+    $('#search_form_2').submit(function(event) {
+      // Validate Depart field
+      validateDepart();
 
+      // Validate Destination field
+      validateDestination();
+
+      // Validate date fields
+      validateJourneyDate();
+      validateReturnDate();
+
+      // Validate same location
+      validateSameLocation();
+
+      // Prevent form submission if there are errors
+      if ($('.form-text.text-danger:visible').length > 0) {
+        event.preventDefault();
+      }
+    });
+
+    function validateDepart() {
+      var departValue = $('#depart').val();
+      if (!departValue) {
+        $('#departError').show();
+      } else {
+        $('#departError').hide();
+      }
+    }
+
+    function validateDestination() {
+      var destinationValue = $('#destination').val();
+      if (!destinationValue) {
+        $('#destinationError').show();
+      } else {
+        $('#destinationError').hide();
+      }
+    }
+
+    function validateJourneyDate() {
+      var journeyDate = new Date($('#journeyDate').val());
       var oneMonthLater = new Date();
       oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
 
       if (journeyDate > oneMonthLater) {
-        $('#journeyDateHelp').text('inavid jouney date');
+        $('#journeyDateHelp').show();
       } else {
-        $('#journeyDateHelp').text('');
+        $('#journeyDateHelp').hide();
       }
+    }
+
+    function validateReturnDate() {
+      var journeyDate = new Date($('#journeyDate').val());
+      var returnDate = new Date($('#returnDate').val());
 
       if (returnDate && returnDate <= journeyDate) {
-        $('#returnDateHelp').text('invalid return date');
+        $('#returnDateHelp').show();
       } else {
-        $('#returnDateHelp').text('');
+        $('#returnDateHelp').hide();
+      }
+    }
+
+    function validateSameLocation() {
+      var departValue = $('#depart').val();
+      var destinationValue = $('#destination').val();
+
+      if (departValue && destinationValue && departValue === destinationValue) {
+        $('#departError').text('cannot be same');
+        $('#departError').show();
+      } else {
+        $('#departError').hide();
       }
     }
   });

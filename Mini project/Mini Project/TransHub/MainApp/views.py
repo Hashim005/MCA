@@ -568,13 +568,13 @@ def find_trip(request):
         except Location.DoesNotExist:
             raise Http404('Destination location does not exist')
 
-        # Filter schedules based on the user's search parameters
+        # Query Schedule model based on search parameters
         schedules = Schedule.objects.all()
 
         if depart:
-            schedules = schedules.filter(depart__location__icontains=depart_location)
+            schedules = schedules.filter(depart=depart_location)
         if destination:
-            schedules = schedules.filter(destination__location__icontains=destination_location)
+            schedules = schedules.filter(destination=destination_location)
         if journey_date:
             # Validate journey_date format (YYYY-MM-DD)
             try:
@@ -588,12 +588,10 @@ def find_trip(request):
 
         context['schedules'] = schedules
 
-        # Redirect to schedule_view_page with the search parameters, but only if journey_date is provided
-        if journey_date:
-            return redirect(reverse('schedule_view_page') + f'?journeyDate={journey_date}')
+        # Render the schedule_view_page template with the filtered schedules
+        return render(request, 'schedule_view_page.html', context)
 
     return render(request, 'find_trip.html', context)
-
 def schedule_view_page(request):
     context = {}
 
@@ -632,6 +630,34 @@ def schedule_view_page(request):
         context['schedules'] = unique_schedules
 
     return render(request, 'schedule_view_page.html', context)
+
+from django.shortcuts import render, redirect
+from .models import Feedback
+from django.contrib.auth.decorators import login_required
+
+@never_cache
+@login_required(login_url="login")
+def submit_feedback(request):
+    if request.method == "POST":
+        feedback_message = request.POST.get('feedback_message')
+        if feedback_message:
+            Feedback.objects.create(User=request.user, message=feedback_message)
+            # You can add additional logic here (e.g., sending a confirmation email)
+            return redirect('feedback_thankyou')
+
+    return render(request, 'feedback_form.html')
+
+
+def feedback_thankyou(request):
+     return render(request,'feedback_thankyou.html')
+
+
+from django.shortcuts import render
+from .models import Feedback
+
+def adminfeedback(request):
+    feedback_list = Feedback.objects.all()
+    return render(request, 'adminfeedback.html', {'feedback_list': feedback_list})
 
 
 

@@ -9,6 +9,7 @@
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <!-- Select2 CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
+  <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <!-- Bootstrap JS, Popper.js, and jQuery -->
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
@@ -88,7 +89,7 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light">
+  <nav class="navbar navbar-expand-lg navbar-light">
     <a class="navbar-brand" href="#">Your Logo</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -105,7 +106,7 @@
           <a class="nav-link" href="#">Cancellation</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Feedback</a>
+          <a class="nav-link" href="{% url "submit_feedback" %}">Feedback</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">My Account</a>
@@ -118,14 +119,14 @@
 </nav>
 
 <div class="container search_panel">
-  <form action="{% url "schedule_view_page" %}" id="search_form_2" class="search_panel_content d-flex flex-wrap justify-content-between align-items-center">
+  <form action="{% url 'find_trip' %}" method="GET" id="search_form_2" class="search_panel_content d-flex flex-wrap justify-content-between align-items-center">
     {% csrf_token %}
     <div class="search_item">
       <label for="depart">Depart</label>
       <select name="depart" id="depart" class="form-select select2 rounded-0">
         <option selected></option>
         {% for location in locations %}
-        <option value="{{ location.id }}">{{ location }}</option>
+          <option value="{{ location.id }}">{{ location }}</option>
         {% endfor %}
       </select>
       <span id="departError" class="form-text text-danger">Please select a location</span>
@@ -135,7 +136,7 @@
       <select name="destination" id="destination" class="form-select select2 rounded-0">
         <option selected></option>
         {% for location in locations %}
-        <option value="{{ location.id }}">{{ location }}</option>
+          <option value="{{ location.id }}">{{ location }}</option>
         {% endfor %}
       </select>
       <span id="destinationError" class="form-text text-danger">Please select a location</span>
@@ -190,98 +191,8 @@
     // Hide error messages initially
     $('.form-text.text-danger').hide();
 
-    // Show error messages only on user interaction
-    $('#depart').change(function() {
-      validateDepart();
-      validateSameLocation();
-    });
+    // Your other script code goes here
 
-    $('#destination').change(function() {
-      validateDestination();
-      validateSameLocation();
-    });
-
-    $('#journeyDate').change(function() {
-      validateJourneyDate();
-    });
-
-    $('#returnDate').change(function() {
-      validateReturnDate();
-    });
-
-    // Validate form before submission
-    $('#search_form_2').submit(function(event) {
-      // Validate Depart field
-      validateDepart();
-
-      // Validate Destination field
-      validateDestination();
-
-      // Validate date fields
-      validateJourneyDate();
-      validateReturnDate();
-
-      // Validate same location
-      validateSameLocation();
-
-      // Prevent form submission if there are errors
-      if ($('.form-text.text-danger:visible').length > 0) {
-        event.preventDefault();
-      }
-    });
-
-    function validateDepart() {
-      var departValue = $('#depart').val();
-      if (!departValue) {
-        $('#departError').show();
-      } else {
-        $('#departError').hide();
-      }
-    }
-
-    function validateDestination() {
-      var destinationValue = $('#destination').val();
-      if (!destinationValue) {
-        $('#destinationError').show();
-      } else {
-        $('#destinationError').hide();
-      }
-    }
-
-    function validateJourneyDate() {
-      var journeyDate = new Date($('#journeyDate').val());
-      var oneMonthLater = new Date();
-      oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
-
-      if (journeyDate > oneMonthLater) {
-        $('#journeyDateHelp').show();
-      } else {
-        $('#journeyDateHelp').hide();
-      }
-    }
-
-    function validateReturnDate() {
-      var journeyDate = new Date($('#journeyDate').val());
-      var returnDate = new Date($('#returnDate').val());
-
-      if (returnDate && returnDate <= journeyDate) {
-        $('#returnDateHelp').show();
-      } else {
-        $('#returnDateHelp').hide();
-      }
-    }
-
-    function validateSameLocation() {
-      var departValue = $('#depart').val();
-      var destinationValue = $('#destination').val();
-
-      if (departValue && destinationValue && departValue === destinationValue) {
-        $('#departError').text('cannot be same');
-        $('#departError').show();
-      } else {
-        $('#departError').hide();
-      }
-    }
   });
 </script>
 </body>

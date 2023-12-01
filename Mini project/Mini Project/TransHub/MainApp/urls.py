@@ -54,4 +54,8 @@ urlpatterns = [
     path('find_trip/',views.find_trip,name='find_trip'),
     path('schedule_view_page/', views.schedule_view_page, name='schedule_view_page'),
 
+    path('submit_feedback/', views.submit_feedback, name='submit_feedback'),
+    path('feedback_thankyou/', views.feedback_thankyou, name='feedback_thankyou'), 
+    path("adminfeedback",views.adminfeedback,name='adminfeedback'),
+
 ]

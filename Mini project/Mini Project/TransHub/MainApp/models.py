@@ -69,3 +69,11 @@ class Schedule(models.Model):
 
     def __str__(self):
         return str(self.code + ' - ' + self.bus.bus_number)
+
+
+from django.db import models
+
+class Feedback(models.Model):
+    User = models.ForeignKey(Users, on_delete=models.CASCADE)  # Assuming you have a User model
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)

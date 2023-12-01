@@ -30,7 +30,31 @@
       background-repeat: no-repeat;
     }
 
+    nav.navbar {
+      background-color: white;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-nav li.nav-item a.nav-link {
+      color: red !important;
+      font-weight: bold;
+      cursor: pointer; /* Change the mouse pointer */
+      transition: color 0.3s, box-shadow 0.3s; /* Add a smooth transition for color and box-shadow changes on hover */
+      box-shadow: none; /* Remove the initial box-shadow */
+      border-radius: 20px; /* Set border-radius for oval shape */
+      padding: 10px 20px; /* Adjust padding for the oval shape */
+    }
+
+    .navbar-nav li.nav-item a.nav-link:hover {
+      color: darkred; /* Change the color on hover */
+      background-color: skyblue; /* Set hover background color to sky blue */
+    }
+
     .search_panel {
+      margin-top: 70px; /* Adjust the margin to make space for the fixed navbar */
       width: 80%;
     }
 
@@ -60,10 +84,38 @@
     .form-text.text-danger {
       display: none;
     }
-
   </style>
 </head>
 <body>
+
+<nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="#">Your Logo</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Contact Us</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Cancellation</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Feedback</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">My Account</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Status Check</a>
+        </li>
+      </ul>
+    </div>
+</nav>
 
 <div class="container search_panel">
   <form action="{% url "schedule_view_page" %}" id="search_form_2" class="search_panel_content d-flex flex-wrap justify-content-between align-items-center">
@@ -103,11 +155,6 @@
   </form>
 </div>
 
-<!-- Bootstrap JS, Popper.js, and jQuery -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script>
   $(document).ready(function() {
     // Initialize Select2 for the "Depart" field

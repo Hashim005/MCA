@@ -1,0 +1,209 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%)
+        }
+        #seat_view{
+            width: 700px;
+            margin-left: 50px;
+            
+        }
+        #head{
+            background-color: green;
+            padding: 10px;
+            width: 400px;
+            height: 60px;
+            border-radius: 35px;
+            background-color: #0093E9;
+            margin-left: 150px;
+            margin-top: 30px;
+        }
+        h2{
+            text-align: center;
+            color: white;
+        }
+        #front{
+            text-align: center;
+            font-size: 20px;
+            color: white;
+        }
+        #row{
+            height: 100px;
+            width: 470px;
+            margin-left: 100px;
+            margin-top: 5px;
+            display: flex;
+            padding-left: 30px;
+        }
+        #column {
+            height: 80px;
+            width: 80px;
+            background-color: green;
+            margin-top: 5px;
+            margin-left: 5px;
+            text-align: center;
+            background: radial-gradient(circle, rgba(156, 195, 222, 1) 0%, rgba(110, 185, 238, 1) 25%, rgba(64, 144, 212, 1) 50%, rgba(46, 135, 196, 1) 75%, rgba(40, 121, 177, 1) 100%);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #column1 {
+            height: 80px;
+            width: 80px;
+            background-color: green;
+            margin-top: 5px;
+            margin-left: 5px;
+            text-align: center;
+            background: radial-gradient(circle, rgba(178, 64, 212, 1) 0%, rgba(137, 26, 158, 1) 25%, rgba(118, 12, 149, 1) 50%, rgba(126, 17, 149, 1) 75%, rgba(94, 2, 121, 1) 100%);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #column:hover{
+            background: white;
+        }
+        #column1:hover{
+            background: white;
+        }
+        #none{
+            height: 80px;
+            width: 80px;
+            margin-top: 5px;
+            margin-left: 5px;
+            text-align: center;
+        }
+        #deatils{
+            height:750px;
+            width: 500px;
+            margin-left: 750px;
+            margin-top: -950px;
+            border-left: solid 1px white;
+        }
+        #selected_seat{
+            height:150px;
+            width:300px;
+            margin-left: 10px;
+            color: white;
+        }
+        #submit{
+            margin-left: 40px;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background-image: linear-gradient(to right, #77A1D3 0%, #79CBCA 51%, #77A1D3 100%);
+        }
+        #first_classs{
+            height: 60px;
+            width: 60px;
+            margin-left: 15px;
+            background: radial-gradient(circle, rgba(178, 64, 212, 1) 0%, rgba(137, 26, 158, 1) 25%, rgba(118, 12, 149, 1) 50%, rgba(126, 17, 149, 1) 75%, rgba(94, 2, 121, 1) 100%);
+        }
+        #Economic_classs{
+            height: 60px;
+            width: 60px;
+            margin-left: 15px;
+            background: radial-gradient(circle, rgba(156, 195, 222, 1) 0%, rgba(110, 185, 238, 1) 25%, rgba(64, 144, 212, 1) 50%, rgba(46, 135, 196, 1) 75%, rgba(40, 121, 177, 1) 100%);
+        }
+        #Booked_classs{
+            height: 60px;
+            width: 60px;
+            margin-left: 15px;
+            background: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="seat_view">
+        <div id="head"><h2>Select Your Seat</h2></div>
+    <p id="front">
+        From Front Row
+    </p>
+    <div id="row">
+        <div id="column1">1</div>
+        <div id="column1">2</div>
+        <div id="none"></div>
+        <div id="column1">3</div>
+        <div id="column1">4</div>
+    </div>
+    <div id="row">
+        <div id="column1">5</div>
+        <div id="column1">6</div>
+        <div id="none"></div>
+        <div id="column1">7</div>
+        <div id="column1">8</div>
+    </div>
+    <div id="row">
+        <div id="none"></div>
+        <div id="none"></div>
+        <div id="none"></div>
+        <div id="column">11</div>
+        <div id="column">12</div>
+    </div>
+    <div id="row">
+        <div id="column"></div>
+        <div id="column"></div>
+        <div id="none"></div>
+        <div id="column"></div>
+        <div id="column"></div>
+    </div>
+    <div id="row">
+        <div id="column"></div>
+        <div id="column"></div>
+        <div id="none"></div>
+        <div id="column"></div>
+        <div id="column"></div>
+    </div>
+    <div id="row">
+        <div id="column"></div>
+        <div id="column"></div>
+        <div id="none"></div>
+        <div id="column"></div>
+        <div id="column"></div>
+    </div>
+    <div id="row">
+        <div id="column"></div>
+        <div id="column"></div>
+        <div id="none"></div>
+        <div id="column"></div>
+        <div id="column"></div>
+    </div>
+    <div id="row">
+        <div id="column"></div>
+        <div id="column"></div>
+        <div id="none"></div>
+        <div id="column"></div>
+        <div id="column"></div>
+    </div>
+    <div id="row">
+        <div id="column"></div>
+        <div id="column"></div>
+        <div id="column"></div>
+        <div id="column"></div>
+        <div id="column"></div>
+    </div>
+    <p id="front">
+        End of Seat Row
+    </p>
+    </div>
+    <div id="deatils">
+        <h3 style="margin-left: 15; color: white;">Booking Details</h3>
+        <p style="margin-left: 15; font-size: 17px;color: white;">Selected Seats:</p>
+        <input type="text" id="selected_seat" placeholder="Please Select Your Seat First"><br>
+        <p style="margin-left: 15; font-size: 22px;color: white;">Total Cost:$200</p><br>
+        <button type="submit" id="submit">SUBMIT BOOK</button><br><br>
+        <div id="first_classs"></div><p style="font-size: 18;margin-left: 90px; margin-top: -45px;">First Class</p><br>
+        <div id="Economic_classs"></div><p style="font-size: 18;margin-left: 90px; margin-top: -45px;">Economic Class</p><br>
+        <div id="Booked_classs"></div><p style="font-size: 18;margin-left: 90px; margin-top: -45px;">Already Booked</p>
+    </div>
+    
+    
+</body>
+</html>

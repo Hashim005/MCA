@@ -6,7 +6,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
-from .models import Bus, Category, Location, Schedule, Users
+from .models import Bus, Category, Location, Schedule, Users,Seat
 from TransHub.settings import EMAIL_HOST_USER
 from .models import Users
 from django.core.mail import send_mail
@@ -658,6 +658,19 @@ from .models import Feedback
 def adminfeedback(request):
     feedback_list = Feedback.objects.all()
     return render(request, 'adminfeedback.html', {'feedback_list': feedback_list})
+
+from django.shortcuts import render
+
+def seat_reservation(request):
+    rows = range(1, 5)
+    cols = range(1, 11)
+
+    return render(request, 'seat_reservation.html', {'rows': rows, 'cols': cols})
+
+
+
+
+
 
 
 

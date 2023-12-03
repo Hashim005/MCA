@@ -57,5 +57,7 @@ urlpatterns = [
     path('submit_feedback/', views.submit_feedback, name='submit_feedback'),
     path('feedback_thankyou/', views.feedback_thankyou, name='feedback_thankyou'), 
     path("adminfeedback",views.adminfeedback,name='adminfeedback'),
+    path('seat_reservation/',views.seat_reservation,name='seat_resevation'),
+   
 
 ]

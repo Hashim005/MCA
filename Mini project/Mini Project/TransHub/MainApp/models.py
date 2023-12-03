@@ -69,6 +69,16 @@ class Schedule(models.Model):
 
     def __str__(self):
         return str(self.code + ' - ' + self.bus.bus_number)
+    
+class Seat(models.Model):
+    bus = models.ForeignKey(Bus, on_delete=models.CASCADE)
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
+    seat_number = models.IntegerField()
+    is_female_only = models.BooleanField(default=False)
+    is_booked = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.bus.bus_number} - {self.schedule.code} - Seat {self.seat_number}"
 
 
 from django.db import models

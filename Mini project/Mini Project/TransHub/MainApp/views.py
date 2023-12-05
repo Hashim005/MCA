@@ -661,11 +661,10 @@ def adminfeedback(request):
 
 from django.shortcuts import render
 
-def seat_reservation(request):
-    rows = range(1, 5)
-    cols = range(1, 11)
-
-    return render(request, 'seat_reservation.html', {'rows': rows, 'cols': cols})
+def seat_reservation(request,code):
+    res=Schedule.objects.filter(code=code).first()
+    context={'bus':res}
+    return render(request, 'seat_reservation.html',context)
 
 
 

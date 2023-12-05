@@ -84,7 +84,7 @@
             <td>{{ schedule.depart }} - {{ schedule.destination }}</td>
             <td>{{ schedule.fare|intcomma }}</td>
             <td>
-              <button type="button" class="btn btn-primary">Book Now</button>
+              <a type="button" class="btn btn-primary" href="/seat_reservation/{{schedule.code}}">Book Now</a>
             </td>
           </tr>
         {% endfor %}

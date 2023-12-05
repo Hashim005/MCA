@@ -44,15 +44,11 @@
                 <span id="password-error" class="text-danger"></span>
             </div>
             <!-- New Password Field (For Forgot Password) -->
-            <div class="form-group" id="newPasswordContainer" style="display: none;">
-                <label for="newPassword">New Password</label>
-                <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="Enter your new password">
-            </div>
             <!-- Forgot Password Link -->
             <p class="text-right"><a href="{% url 'password_reset'%}" id="forgotPasswordLink">Forgot Password?</a></p>
             <!-- Submit Button -->
             <p>{{Error_message}}</p>
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
+            <button type="submit" class="btn btn-primary btn-block" id="login-btn">Login</button>
         </form>
     </div>
 

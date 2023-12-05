@@ -90,9 +90,9 @@
     <h3>Submit Feedback</h3></center>
     <form method="post">
         {% csrf_token %}
-        <textarea name="feedback_message" rows="5" cols="50" placeholder="Enter your feedback here" required></textarea>
+        <textarea name="feedback_message" rows="5" cols="50" placeholder="Enter your feedback here" id="feedback_form" required></textarea>
         <br>
-        <button type="submit">Submit Feedback</button>
+        <button type="submit" id="feedback_submit">Submit Feedback</button>
     </form>
 </body>
 </html>

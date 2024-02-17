@@ -87,3 +87,21 @@ class Feedback(models.Model):
     User = models.ForeignKey(Users, on_delete=models.CASCADE)  # Assuming you have a User model
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
+
+from django.db import models
+from .models import Schedule
+class Booking(models.Model):
+    book_id = models.AutoField(primary_key=True)
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
+    passenger_name = models.CharField(max_length=255, blank=True, null=True)
+    age = models.PositiveIntegerField(blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    email_id = models.EmailField(unique=True, null=True)
+    seat_no = models.CharField(max_length=10, blank=True, null=True)
+    gender = models.CharField(max_length=10, blank=True, null=True)
+    total_price = models.CharField(max_length=10, blank=True, null=True)  # Example field for total price
+
+
+    def __str__(self): 
+        return f"Booking ID: {self.book_id} - Passenger: {self.passenger_name} - Schedule: {self.schedule}"

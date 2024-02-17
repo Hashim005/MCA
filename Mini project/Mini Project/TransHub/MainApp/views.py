@@ -130,6 +130,7 @@ def Staff_signUp(request):
 
     return render(request, 'StaffSignUp.html')
 
+@never_cache
 def Admin_Home(request):
      if not request.user.is_authenticated:
          return redirect ('login')
@@ -206,26 +207,48 @@ from django.shortcuts import render, redirect
 from .forms import SaveBus, SaveCategory, SaveLocation, SaveSchedule, UserProfileForm, AdditionalProfileForm
 
 def update_profile(request):
-    # Check if the UserProfile exists for the user, and create it if it doesn't
     try:
         user_profile = UserProfile.objects.get(user=request.user)
     except UserProfile.DoesNotExist:
         user_profile = UserProfile(user=request.user)
         user_profile.save()
 
-    user_form = UserProfileForm(request.POST, instance=request.user)
-    profile_form = AdditionalProfileForm(request.POST, request.FILES, instance=user_profile)
+    try:
+        user = Users.objects.get(username=request.user.username)
+    except Users.DoesNotExist:
+        user = None
 
     if request.method == 'POST':
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            return redirect('profile')
-    else:
-        user_form = UserProfileForm(instance=request.user)
-        profile_form = AdditionalProfileForm(instance=user_profile)
+        phone_number = request.POST.get('phone_number')
+        age = request.POST.get('age')
+        gender = request.POST.get('gender')
+        city = request.POST.get('city')
+        date_of_birth = request.POST.get('date_of_birth')
+        profile_picture = request.FILES.get('profile_picture')  # Updated this line
 
-    return render(request, 'update_profile.html', {'user_form': user_form, 'profile_form': profile_form})
+        # Additional validation if needed
+        # ...
+
+        # Update Users fields
+        user.phone_number = phone_number
+        user.save()
+
+        # Update UserProfile fields
+        user_profile.age = age
+        user_profile.gender = gender
+        user_profile.city = city
+        user_profile.date_of_birth = date_of_birth
+        if profile_picture:
+            user_profile.profile_picture = profile_picture  # Updated this line
+
+        user_profile.save()
+
+        messages.success(request, 'Profile updated successfully.')
+        return redirect('profile')
+
+    return render(request, 'update_profile.html', {'user_profile': user_profile, 'user': user})
+
+
 
 
 def profile(request):
@@ -659,12 +682,57 @@ def adminfeedback(request):
     feedback_list = Feedback.objects.all()
     return render(request, 'adminfeedback.html', {'feedback_list': feedback_list})
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Booking, Schedule
+
+def seat_reservation(request, code):
+    if request.method == 'POST':
+        # Get the selected seats and total price from the form submission
+        selected_seats = request.POST.get('selected_seats')
+        total_price = request.POST.get('total_price', 0)  # Get the total price from the form data
+        
+        # Assuming you have the schedule instance for the booking
+        schedule = Schedule.objects.get(code=code)
+
+        # Save the booking details to the database
+        booking = Booking.objects.create(
+            schedule=schedule,
+            seat_no=selected_seats,
+            total_price=total_price,
+            # You can add other fields here if needed
+        )
+
+        # Optionally, you can add a success message
+        messages.success(request, 'Booking successfully submitted!')
+
+        # Redirect the user to a success page or any other page
+        return redirect('passenger_details')
+
+    else:
+        # Handle the GET request here
+        res = Schedule.objects.filter(code=code).first()
+        context = {'bus': res}
+        return render(request, 'seat_reservation.html', context)
+
+
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Booking, Schedule
+
 from django.shortcuts import render
 
-def seat_reservation(request,code):
-    res=Schedule.objects.filter(code=code).first()
-    context={'bus':res}
-    return render(request, 'seat_reservation.html',context)
+def passenger_details(request):
+    # Add your view logic here
+    return render(request, 'passenger_details.html')  # Assuming you have a template named 'passenger_view_page.html'
+
+
+
+
+
 
 
 

@@ -338,6 +338,8 @@ li.seatCharts-legendItem {
 
                         <form action="" method="post">
 
+							{% csrf_token %} <!-- Add this line to include CSRF token -->
+
                             <h2>Booking Details</h2>
 
                             <h3> Selected Seats (<span id="counter">0</span>):</h3>
@@ -345,6 +347,9 @@ li.seatCharts-legendItem {
 
                             <h2>Total: <b>$<span id="total">0</span></b></h2>
                             <input type="hidden" value="">
+							<input type="hidden" name="selected_seats" value="{{ selected_seats }}">
+							<input type="hidden" name="total_price" value="{{ total_price }}">
+						
 
                             <button type="submit" id="checkout-button">Submit Book</button>
 

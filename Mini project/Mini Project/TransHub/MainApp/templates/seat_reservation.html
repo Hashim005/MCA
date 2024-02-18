@@ -3,8 +3,11 @@
 
 <head>
     <title>Simple Bus Seat Reservation Site</title>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href='http://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/jquery.seat-charts.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
 
@@ -12,6 +15,9 @@
     <script src="js/jquery.seat-charts.js"></script>
 
     <style>
+		.hidden {
+            display: none;
+        }
         div.seatCharts-container {
             /*min-width: 700px;*/
         }
@@ -318,6 +324,34 @@ li.seatCharts-legendItem {
     cursor: pointer;
     background-image: linear-gradient(to right, #06beb6 0%, #48b1bf 51%, #06beb6 100%);
 }
+.btn-custom {
+	background-color: skyblue; /* Sky Blue */
+	border: none;
+	color: white;
+	padding: 15px 32px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin: 4px 2px;
+	transition-duration: 0.4s;
+	cursor: pointer;
+	border-radius: 12px;
+	box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+  
+  .btn-custom:hover {
+	background-color: #87ceeb; /* Darker Sky Blue */
+  }
+  #passengerDetails input[type="text"],
+        #passengerDetails input[type="number"],
+        #passengerDetails input[type="email"],
+        #passengerDetails input[type="tel"],
+		#passengerDetails input[type="seat"],
+        #passengerDetails label,
+        #passengerDetails h3 {
+            font-size: 0.8rem; /* Adjust the font size here */
+        }
     </style>
 </head>
 
@@ -345,11 +379,12 @@ li.seatCharts-legendItem {
                             <h3> Selected Seats (<span id="counter">0</span>):</h3>
                             <ul id="selected-seats"></ul>
 
-                            <h2>Total: <b>$<span id="total">0</span></b></h2>
+                            <h2>Total: <b><span id="total">0</span></b></h2>
                             <input type="hidden" value="">
 							<input type="hidden" name="selected_seats" value="{{ selected_seats }}">
 							<input type="hidden" name="total_price" value="{{ total_price }}">
-						
+
+
 
                             <button type="submit" id="checkout-button">Submit Book</button>
 
@@ -358,11 +393,88 @@ li.seatCharts-legendItem {
                         <div id="legend"></div>
                         <button id="reset-btn" type="button">Reset Bus Seat</button>
                     </div>
+						<div>
+							<button id="submitBook" class="btn btn-primary btn-md">Passenger Details</button>
+
+							<form id="bookingForm" class="hidden">
+								<label for="numSeats">Number of Seats:</label>
+								<select id="numSeats">
+									<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>
+									<option value="5">5</option>
+								</select>
+						
+								<div id="passengerDetails"></div><br><br>
+								<input type="hidden" name="total_price" value="{{ total_price }}">
+								<button type="submit">Submit</button>
+							</form>
+						</div>
                 </div>
             </div>
         </div>
     </div>
+	
+	<script>
+        document.getElementById('submitBook').addEventListener('click', function() {
+            document.getElementById('bookingForm').classList.remove('hidden');
+        });
 
+        document.getElementById('numSeats').addEventListener('change', function() {
+            var numSeats = parseInt(this.value);
+            addPassengerDetails(numSeats);
+        });
+
+        // Function to add passenger details fields dynamically
+        function addPassengerDetails(numSeats) {
+            var passengerDetailsDiv = document.getElementById('passengerDetails');
+            passengerDetailsDiv.innerHTML = ''; // Clear previous fields
+            for (var i = 1; i <= numSeats; i++) {
+                var passengerFields = `
+                    <div>
+                        <h3>Passenger ${i}</h3>
+                        
+                        <label for="name${i}">Name:</label>
+                        <input type="text" id="name${i}" name="name${i}"  required><br><br>
+        
+                        <label for="age${i}">Age:</label>
+                        <input type="number" id="age${i}" name="age${i}"  required><br><br>
+        
+                        <label>Gender:</label>
+                        <label for="male${i}">Male</label>
+                        <input type="radio" id="male${i}" name="gender${i}" value="male"  required>
+                        <label for="female${i}">Female</label>
+                        <input type="radio" id="female${i}" name="gender${i}" value="female"  required><br><br>
+        
+                        <label for="phone${i}">Phone Number:</label>
+                        <input type="tel" id="phone${i}" name="phone${i}"  required><br><br>
+        
+                        <label for="email${i}">Email ID:</label>
+                        <input type="email" id="email${i}" name="email${i}"  required><br><br>
+
+						<label for="seatNumber${i}">Seat Number:</label>
+                        <input type="text" id="seatNumber${i}" name="seatNumber${i}" required><br><br>
+                    </div>
+                `;
+                passengerDetailsDiv.innerHTML += passengerFields;
+            }
+        }
+
+        // Initialize with one passenger detail field
+        addPassengerDetails(1);
+
+        // Form submission logic
+        document.getElementById('bookingForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            // Here you can handle form submission using AJAX or any other method
+            console.log('Form submitted');
+            // Reset the form after submission if needed
+            this.reset();
+            // Hide the form again after submission
+            this.classList.add('hidden');
+        });
+    </script>
 
     <script src="./js/script.js"></script>
     <script>
@@ -1128,6 +1240,10 @@ $(function() {
 	
 })(jQuery);
     </script>
+
 </body>
+	<div>
+		<h1>saet booking-details</h1>
+	</div>
 
 </html>

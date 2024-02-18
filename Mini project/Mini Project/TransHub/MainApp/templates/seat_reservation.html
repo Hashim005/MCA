@@ -343,15 +343,60 @@ li.seatCharts-legendItem {
   .btn-custom:hover {
 	background-color: #87ceeb; /* Darker Sky Blue */
   }
-  #passengerDetails input[type="text"],
-        #passengerDetails input[type="number"],
-        #passengerDetails input[type="email"],
-        #passengerDetails input[type="tel"],
-		#passengerDetails input[type="seat"],
-        #passengerDetails label,
-        #passengerDetails h3 {
-            font-size: 0.8rem; /* Adjust the font size here */
-        }
+  .hidden {
+	display: none;
+}
+
+/* Custom CSS for compact form design */
+.form-section {
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	margin-bottom: 15px;
+}
+
+/* Adjust font size of labels and input fields */
+.form-section label,
+.form-section input[type="text"],
+.form-section input[type="number"],
+.form-section input[type="email"],
+.form-section input[type="tel"],
+.form-section input[type="seat"],
+.form-section label,
+.form-section h3 {
+	font-size: 0.9rem;
+}
+
+/* Style for the Submit button */
+#submitBook {
+	border-radius: 5px;
+	font-size: 1rem;
+	padding: 8px 20px;
+}
+
+/* Adjust width of form sections and input fields */
+.form-section {
+	max-width: 400px;
+	margin: auto;
+}
+
+.form-section label {
+	width: 100%;
+}
+
+.form-section input[type="text"],
+.form-section input[type="number"],
+.form-section input[type="email"],
+.form-section input[type="tel"],
+.form-section input[type="seat"],
+.form-section select {
+	width: calc(100% - 20px); /* Adjust based on padding */
+}
+
+.gender-label {
+	width: auto;
+}
+
     </style>
 </head>
 
@@ -393,24 +438,38 @@ li.seatCharts-legendItem {
                         <div id="legend"></div>
                         <button id="reset-btn" type="button">Reset Bus Seat</button>
                     </div>
-						<div>
-							<button id="submitBook" class="btn btn-primary btn-md">Passenger Details</button>
-
-							<form id="bookingForm" class="hidden">
-								<label for="numSeats">Number of Seats:</label>
-								<select id="numSeats">
-									<option value="1">1</option>
-									<option value="2">2</option>
-									<option value="3">3</option>
-									<option value="4">4</option>
-									<option value="5">5</option>
-								</select>
-						
-								<div id="passengerDetails"></div><br><br>
-								<input type="hidden" name="total_price" value="{{ total_price }}">
-								<button type="submit">Submit</button>
-							</form>
+					<div class="container">
+						<div class="row justify-content-center">
+							<div class="col-md-8">
+								<div class="card">
+									<div class="card-body">
+										<h2 class="card-title text-center mb-4">Travelix Booking</h2>
+										<button id="submitBook" class="btn btn-primary btn-block">Passenger Details</button>
+				
+										<form id="bookingForm" class="hidden">
+											<div id="numSeatsSection" class="form-section">
+												<label for="numSeats">Number of Seats:</label>
+												<select id="numSeats" class="form-control">
+													<option value="1">1</option>
+													<option value="2">2</option>
+													<option value="3">3</option>
+													<option value="4">4</option>
+													<option value="5">5</option>
+												</select>
+											</div>
+				
+											<div id="passengerDetails"></div><br><br>
+				
+											<!-- Hidden input field for total price -->
+											<input type="hidden" id="totalPrice" name="totalPrice">
+				
+											<button type="submit" class="btn btn-primary btn-block">Submit</button>
+										</form>
+									</div>
+								</div>
+							</div>
 						</div>
+					</div>
                 </div>
             </div>
         </div>
@@ -432,31 +491,46 @@ li.seatCharts-legendItem {
             passengerDetailsDiv.innerHTML = ''; // Clear previous fields
             for (var i = 1; i <= numSeats; i++) {
                 var passengerFields = `
-                    <div>
-                        <h3>Passenger ${i}</h3>
-                        
-                        <label for="name${i}">Name:</label>
-                        <input type="text" id="name${i}" name="name${i}"  required><br><br>
-        
-                        <label for="age${i}">Age:</label>
-                        <input type="number" id="age${i}" name="age${i}"  required><br><br>
-        
-                        <label>Gender:</label>
-                        <label for="male${i}">Male</label>
-                        <input type="radio" id="male${i}" name="gender${i}" value="male"  required>
-                        <label for="female${i}">Female</label>
-                        <input type="radio" id="female${i}" name="gender${i}" value="female"  required><br><br>
-        
-                        <label for="phone${i}">Phone Number:</label>
-                        <input type="tel" id="phone${i}" name="phone${i}"  required><br><br>
-        
-                        <label for="email${i}">Email ID:</label>
-                        <input type="email" id="email${i}" name="email${i}"  required><br><br>
-
-						<label for="seatNumber${i}">Seat Number:</label>
-                        <input type="text" id="seatNumber${i}" name="seatNumber${i}" required><br><br>
-                    </div>
-                `;
+                    <div class="form-section border p-3 mb-3">
+                        <h3 class="mb-3">Passenger ${i}</h3>
+                        <div class="form-group">
+                            <label for="name${i}">Name:</label>
+                            <input type="text" id="name${i}" name="name${i}" class="form-control" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="age${i}">Age:</label>
+                                <input type="number" id="age${i}" name="age${i}" class="form-control" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="gender${i}" class="gender-label">Gender:</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="gender${i}" id="male${i}" value="male" required>
+                                    <label class="form-check-label" for="male${i}">Male</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="gender${i}" id="female${i}" value="female" required>
+                                    <label class="form-check-label" for="female${i}">Female</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email${i}">Email:</label>
+                            <input type="email" id="email${i}" name="email${i}" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone${i}">Phone Number:</label>
+                            <input type="tel" id="phone${i}" name="phone${i}" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="seatNumber${i}">Seat Number:</label>
+                            <input type="text" id="seatNumber${i}" name="seatNumber${i}" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="price${i}">Price:</label>
+                            <input type="number" id="price${i}" name="price${i}" class="form-control" required>
+                        </div>
+                    </div>`;
                 passengerDetailsDiv.innerHTML += passengerFields;
             }
         }
@@ -467,6 +541,13 @@ li.seatCharts-legendItem {
         // Form submission logic
         document.getElementById('bookingForm').addEventListener('submit', function(event) {
             event.preventDefault();
+            // Calculate total price
+            var totalPrice = 0;
+            var priceInputs = document.querySelectorAll('[id^="price"]');
+            priceInputs.forEach(function(input) {
+                totalPrice += parseFloat(input.value) || 0;
+            });
+            document.getElementById('totalPrice').value = totalPrice.toFixed(2);
             // Here you can handle form submission using AJAX or any other method
             console.log('Form submitted');
             // Reset the form after submission if needed

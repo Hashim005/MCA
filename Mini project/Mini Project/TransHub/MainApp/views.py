@@ -682,57 +682,8 @@ def adminfeedback(request):
     feedback_list = Feedback.objects.all()
     return render(request, 'adminfeedback.html', {'feedback_list': feedback_list})
 
-from django.shortcuts import render, redirect
-from .models import Booking, Schedule
-from django.contrib import messages
-
-def seat_reservation(request, code):
-    if request.method == 'POST':
-        # Get form data
-        num_seats = int(request.POST.get('numSeats'))  # Number of seats selected
-        total_price = request.POST.get('totalPrice')  # Total price of the booking
-        
-        # Create a list to store booking instances
-        bookings = []
-        
-        # Get schedule instance
-        schedule = Schedule.objects.get(code=code)
-        
-        # Loop through each seat and create a booking instance
-        for i in range(1, num_seats + 1):
-            passenger_name = request.POST.get(f'name{i}')
-            age = request.POST.get(f'age{i}')
-            gender = request.POST.get(f'gender{i}')
-            email_id = request.POST.get(f'email{i}')
-            phone_number = request.POST.get(f'phone{i}')
-            seat_no = request.POST.get(f'seatNumber{i}')
-            price = request.POST.get(f'price{i}')
-            
-            # Create Booking instance
-            booking = Booking.objects.create(
-                schedule=schedule,
-                passenger_name=passenger_name,
-                age=age,
-                gender=gender,
-                email_id=email_id,
-                phone_number=phone_number,
-                seat_no=seat_no,
-                total_price=price
-            )
-            
-            bookings.append(booking)
-
-        # Optionally, you can add a success message
-        messages.success(request, 'Booking successfully submitted!')
-
-        # Redirect the user to a success page or any other page
-        return redirect('passenger_details')
-    
-    else:
-        # Handle the GET request here
-        res = Schedule.objects.filter(code=code).first()
-        context = {'bus': res}
-        return render(request, 'seat_reservation.html', context)
+def seat_resevation(request):
+    return render(request, 'seat_reservation.html')
 
 
 

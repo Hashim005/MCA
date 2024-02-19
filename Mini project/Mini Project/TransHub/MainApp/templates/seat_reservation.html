@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html>
 
@@ -343,45 +344,18 @@ li.seatCharts-legendItem {
   .btn-custom:hover {
 	background-color: #87ceeb; /* Darker Sky Blue */
   }
-  .hidden {
-	display: none;
-}
-
-/* Custom CSS for compact form design */
-.form-section {
-	padding: 10px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	margin-bottom: 15px;
-}
-
-/* Adjust font size of labels and input fields */
-.form-section label,
-.form-section input[type="text"],
-.form-section input[type="number"],
-.form-section input[type="email"],
-.form-section input[type="tel"],
-.form-section input[type="seat"],
-.form-section label,
-.form-section h3 {
-	font-size: 0.9rem;
-}
-
-/* Style for the Submit button */
-#submitBook {
-	border-radius: 5px;
-	font-size: 1rem;
-	padding: 8px 20px;
-}
-
-/* Adjust width of form sections and input fields */
-.form-section {
-	max-width: 400px;
-	margin: auto;
-}
-
+  /* Custom CSS for improved label clarity */
 .form-section label {
-	width: 100%;
+    font-weight: bold; /* Make labels bold */
+    color: #333; /* Darken label color for better contrast */
+}
+
+/* Custom CSS for improved label clarity and reduced spacing */
+.form-section label {
+    font-weight: bold; /* Make labels bold */
+    color: #333; /* Darken label color for better contrast */
+    font-size: 0.9rem; /* Reduce font size for labels */
+    margin-bottom: 5px; /* Reduce margin bottom for labels */
 }
 
 .form-section input[type="text"],
@@ -390,12 +364,38 @@ li.seatCharts-legendItem {
 .form-section input[type="tel"],
 .form-section input[type="seat"],
 .form-section select {
-	width: calc(100% - 20px); /* Adjust based on padding */
+    border: 1px solid #ccc; /* Add border to input fields for separation */
+    border-radius: 3px; /* Add border radius for a softer look */
+    padding: 8px; /* Add padding to input fields for better spacing */
+    margin-top: 3px; /* Reduce margin top for input fields */
+    font-size: 0.9rem; /* Reduce font size for input fields */
 }
 
-.gender-label {
-	width: auto;
+/* Style for the Submit button */
+#submitBook {
+    border-radius: 5px;
+    font-size: 1rem;
+    padding: 8px 20px;
+    background-color: #007bff; /* Change button background color */
+    color: #fff; /* Change button text color to white */
+    border: none; /* Remove button border */
 }
+
+/* Change button background color on hover */
+#submitBook:hover {
+    background-color: #0056b3;
+}
+
+/* Adjust width of form sections */
+.form-section {
+    max-width: 350px; /* Reduce max width of form sections */
+    margin: auto;
+    background-color: #f9f9f9; /* Add background color for better contrast */
+    padding: 15px; /* Add padding for spacing */
+    border-radius: 5px; /* Add border radius for a softer look */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+}
+
 
     </style>
 </head>
@@ -446,7 +446,8 @@ li.seatCharts-legendItem {
 										<h2 class="card-title text-center mb-4">Travelix Booking</h2>
 										<button id="submitBook" class="btn btn-primary btn-block">Passenger Details</button>
 				
-										<form id="bookingForm" class="hidden">
+										<form id="bookingForm" class="hidden" action="">
+											{% csrf_token %}
 											<div id="numSeatsSection" class="form-section">
 												<label for="numSeats">Number of Seats:</label>
 												<select id="numSeats" class="form-control">
@@ -474,6 +475,9 @@ li.seatCharts-legendItem {
             </div>
         </div>
     </div>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="{% static 'script.js' %}"></script>
 	
 	<script>
         document.getElementById('submitBook').addEventListener('click', function() {
@@ -495,40 +499,40 @@ li.seatCharts-legendItem {
                         <h3 class="mb-3">Passenger ${i}</h3>
                         <div class="form-group">
                             <label for="name${i}">Name:</label>
-                            <input type="text" id="name${i}" name="name${i}" class="form-control" required>
+                            <input type="text" id="name${{i}}" name="name${{i}}" class="form-control" required>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-6">
                                 <label for="age${i}">Age:</label>
-                                <input type="number" id="age${i}" name="age${i}" class="form-control" required>
+                                <input type="number" id="age${{i}}" name="age${{i}}" class="form-control" required>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="gender${i}" class="gender-label">Gender:</label>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="gender${i}" id="male${i}" value="male" required>
+                                    <input class="form-check-input" type="radio" name="gender${{i}}" id="male${{i}}" value="male" required>
                                     <label class="form-check-label" for="male${i}">Male</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="gender${i}" id="female${i}" value="female" required>
+                                    <input class="form-check-input" type="radio" name="gender${{i}}" id="female${{i}}" value="female" required>
                                     <label class="form-check-label" for="female${i}">Female</label>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="email${i}">Email:</label>
-                            <input type="email" id="email${i}" name="email${i}" class="form-control" required>
+                            <input type="email" id="email${{i}}" name="email${{i}}" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label for="phone${i}">Phone Number:</label>
-                            <input type="tel" id="phone${i}" name="phone${i}" class="form-control" required>
+                            <input type="tel" id="phone${{i}}" name="phone${{i}}" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label for="seatNumber${i}">Seat Number:</label>
-                            <input type="text" id="seatNumber${i}" name="seatNumber${i}" class="form-control" required>
+                            <input type="text" id="seatNumber${{i}}" name="seatNumber${{i}}" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label for="price${i}">Price:</label>
-                            <input type="number" id="price${i}" name="price${i}" class="form-control" required>
+                            <input type="number" id="price${{i}}" name="price${{i}}" class="form-control" required>
                         </div>
                     </div>`;
                 passengerDetailsDiv.innerHTML += passengerFields;

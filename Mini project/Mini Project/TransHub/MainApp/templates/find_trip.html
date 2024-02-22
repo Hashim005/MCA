@@ -117,7 +117,6 @@
       </ul>
     </div>
 </nav>
-
 <div class="container search_panel">
   <form action="{% url 'find_trip' %}" method="GET" id="search_form_2" class="search_panel_content d-flex flex-wrap justify-content-between align-items-center">
     {% csrf_token %}
@@ -143,14 +142,17 @@
     </div>
     <div class="search_item">
       <label for="journeyDate">Journey Date</label>
-      <input type="date" id="journeyDate" class="check_in search_input form-control" min="{{ today }}" required="required">
+      <input type="date" id="journeyDate" name="journeyDate" class="check_in search_input form-control" min="{{ today }}" required="required">
       <span id="journeyDateHelp" class="form-text text-danger">Invalid journey date</span>
     </div>
     <div class="search_item">
       <label for="returnDate">Return Date (optional)</label>
-      <input type="date" id="returnDate" class="check_out search_input form-control" min="{{ today }}">
+      <input type="date" id="returnDate" name="returnDate" class="check_out search_input form-control" min="{{ today }}">
       <span id="returnDateHelp" class="form-text text-danger">Invalid return date</span>
     </div>
+
+    <!-- Hidden input field to store journey date -->
+    <input type="hidden" name="journeyDate" id="journeyDateInput">
 
     <button type="submit" class="btn btn-primary search_button">Search</button>
   </form>
@@ -158,42 +160,28 @@
 
 <script>
   $(document).ready(function() {
-    // Initialize Select2 for the "Depart" field
-    $('#depart').select2({
-      placeholder: 'Select location',
-      allowClear: true,
-      theme: 'bootstrap4',
-    });
-    $('#destination').select2({
+    // Initialize Select2 for the "Depart" and "Destination" fields
+    $('#depart, #destination').select2({
       placeholder: 'Select location',
       allowClear: true,
       theme: 'bootstrap4',
     });
 
-    // Array of background images
-    var images = [
-        '/static/MainApp/images/bus_booking4.jpg',
-        '/static/MainApp/images/bus_booking3.jpg',
-        // Add more image URLs as needed
-    ];
+    // Submit the form when the user clicks the "Search" button
+    $('#search_form_2').submit(function(e) {
+      e.preventDefault(); // Prevent default form submission
 
-    var currentImageIndex = 0;
+      // Get the selected journey date
+      const journeyDate = $('#journeyDate').val();
 
-    // Function to change the background image
-    function changeBackground() {
-        $('body').css('background-image', 'url("' + images[currentImageIndex] + '")');
-        currentImageIndex = (currentImageIndex + 1) % images.length;
-    }
+      // Set the value of the hidden input field for journey date
+      $('#journeyDateInput').val(journeyDate);
 
-    // Change the background image every 5 seconds (adjust as needed)
-    setInterval(changeBackground, 5000);
-
-    // Hide error messages initially
-    $('.form-text.text-danger').hide();
-
-    // Your other script code goes here
-
+      // Submit the form
+      this.submit();
+    });
   });
 </script>
+
 </body>
 </html>

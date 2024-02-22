@@ -69,16 +69,18 @@ class Schedule(models.Model):
 
     def __str__(self):
         return str(self.code + ' - ' + self.bus.bus_number)
-    
-class Seat(models.Model):
+
+
+class Seat_map(models.Model):
+    seat_number = models.CharField(max_length=10, primary_key=True)
     bus = models.ForeignKey(Bus, on_delete=models.CASCADE)
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
-    seat_number = models.IntegerField()
-    is_female_only = models.BooleanField(default=False)
-    is_booked = models.BooleanField(default=False)
+    date = models.DateField(default=timezone.now)
+    booked_seat = models.BooleanField(default=False)
+    booked_by = models.ForeignKey(Users, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.bus.bus_number} - {self.schedule.code} - Seat {self.seat_number}"
+        return f"{self.seat_number} - {self.bus} - {self.schedule}"
 
 
 from django.db import models
@@ -89,8 +91,6 @@ class Feedback(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
 
-from django.db import models
-from .models import Schedule
 class Booking(models.Model):
     book_id = models.AutoField(primary_key=True)
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
@@ -101,7 +101,10 @@ class Booking(models.Model):
     seat_no = models.CharField(max_length=10, blank=True, null=True)
     gender = models.CharField(max_length=10, blank=True, null=True)
     total_price = models.CharField(max_length=10, blank=True, null=True)  # Example field for total price
-
+    seat_no_count = models.IntegerField(default=0)  # Field to store the count of selected seats
 
     def __str__(self): 
         return f"Booking ID: {self.book_id} - Passenger: {self.passenger_name} - Schedule: {self.schedule}"
+
+
+    

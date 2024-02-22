@@ -1,12 +1,12 @@
 from collections import UserDict
 import json
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
-from .models import Bus, Category, Location, Schedule, Users,Seat
+from .models import Bus, Category, Location, Schedule, Users,Seat_map
 from TransHub.settings import EMAIL_HOST_USER
 from .models import Users
 from django.core.mail import send_mail
@@ -560,6 +560,9 @@ from django.urls import reverse
 from datetime import datetime
 from .models import Schedule, Location
 
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
 def find_trip(request):
     context = {}
     context['page_title'] = 'Find Trip Schedule'
@@ -599,7 +602,6 @@ def find_trip(request):
         if destination:
             schedules = schedules.filter(destination=destination_location)
         if journey_date:
-            # Validate journey_date format (YYYY-MM-DD)
             try:
                 journey_date = datetime.strptime(journey_date, '%Y-%m-%d').date()
             except ValueError:
@@ -609,34 +611,41 @@ def find_trip(request):
             # Filter schedules for the selected journey_date
             schedules = schedules.filter(schedule__date__contains=journey_date)
 
+        if schedules.exists():
+            schedule_code = schedules.first().code
+            return HttpResponseRedirect(reverse('schedule_view_page', kwargs={'journey_date': journey_date}))
+
         context['schedules'] = schedules
 
         # Render the schedule_view_page template with the filtered schedules
         return render(request, 'schedule_view_page.html', context)
 
     return render(request, 'find_trip.html', context)
-def schedule_view_page(request):
+from django.utils import timezone
+
+from django.utils import timezone
+
+def schedule_view_page(request, journey_date):
     context = {}
 
-    if request.method == 'GET': 
+    if request.method == 'GET':
         depart = request.GET.get('depart')
         destination = request.GET.get('destination')
-        journey_date = request.GET.get('journeyDate')
 
-        # Additional validation can be added here if needed
+        # Validate journey_date format
+        try:
+            journey_date = timezone.datetime.strptime(journey_date, '%Y-%m-%d').date()
+        except ValueError:
+            raise Http404('Invalid journey date format.')
 
         # Filter schedules based on the user's search parameters
-        schedules = Schedule.objects.all()
+        schedules = Schedule.objects.filter(schedule__date=journey_date)
 
         if depart:
             schedules = schedules.filter(depart__location__icontains=depart)
 
         if destination:
             schedules = schedules.filter(destination__location__icontains=destination)
-
-        if journey_date:
-            # Filter schedules for the selected journey_date
-            schedules = schedules.filter(schedule__date__contains=journey_date)
 
         # Create a dictionary to store unique buses based on bus_number
         unique_buses = {}
@@ -653,6 +662,8 @@ def schedule_view_page(request):
         context['schedules'] = unique_schedules
 
     return render(request, 'schedule_view_page.html', context)
+
+
 
 from django.shortcuts import render, redirect
 from .models import Feedback
@@ -682,10 +693,55 @@ def adminfeedback(request):
     feedback_list = Feedback.objects.all()
     return render(request, 'adminfeedback.html', {'feedback_list': feedback_list})
 
-def seat_resevation(request):
-    return render(request, 'seat_reservation.html')
+from .models import Booking
 
+def seat_reservation(request, schedule_code):
+    user = request.user
+    user_profile = user.userprofile
+    
+    # Assuming schedule_code is used to identify the schedule
+    bookings_count = Booking.objects.filter(schedule__code=schedule_code).count()
+    
+    context = {
+        'user_profile': user_profile,
+        'bookings_count': bookings_count,
+        # Other context variables for bus seat reservation
+        # ...
+    }
+    return render(request, 'seat_reservation.html', context)
 
+from django.http import JsonResponse
+from .models import Booking
+
+def create_booking(request):
+    if request.method == 'POST' and request.headers.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        # Extract the selected seat count from the AJAX request
+        selected_seat_count = int(request.POST.get('selectedSeatCount'))
+        
+        # Create a booking object with the count of selected seats
+        booking = Booking.objects.create(
+            seat_no_count=selected_seat_count
+            # You can add other fields here if needed
+        )
+        # Save the booking object
+        booking.save()
+        
+        return JsonResponse({'message': 'Booking successful'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+from django.http import JsonResponse
+from .models import Booking
+
+def create_booking(request):
+    if request.method == 'POST' and request.headers.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        selected_seat_count = int(request.POST.get('selectedSeatCount', 0))
+        # Perform any operation you want with the selected seat count here
+        # For example, saving it to the database
+        booking = Booking.objects.create(seat_no_count=selected_seat_count)
+        booking.save()
+        return JsonResponse({'message': 'Booking successful'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 
@@ -695,9 +751,48 @@ from .models import Booking, Schedule
 
 from django.shortcuts import render
 
-def passenger_details(request):
-    # Add your view logic here
-    return render(request, 'passenger_details.html')  # Assuming you have a template named 'passenger_view_page.html'
+# views.py
+from django.shortcuts import render, redirect
+from .models import Booking  # Import the Booking model
+
+def passengers(request):
+    if request.method == 'POST':
+        num_seats = int(request.POST.get('num_seats'))
+
+        # Loop through each passenger form submitted
+        for i in range(1, num_seats + 1):
+            passenger_name = request.POST.get(f'name{i}')
+            age = request.POST.get(f'age{i}')
+            phone_number = request.POST.get(f'phone{i}')
+            email_id = request.POST.get(f'email{i}')
+            seat_no = request.POST.get(f'seatNumber{i}')
+            gender = request.POST.get(f'gender{i}')
+            total_price = request.POST.get(f'price{i}')  # Example field for total price
+
+            # Create and save Booking object
+            booking = Booking.objects.create(
+                schedule=None,  # You need to specify the schedule here
+                passenger_name=passenger_name,
+                age=age,
+                phone_number=phone_number,
+                email_id=email_id,
+                seat_no=seat_no,
+                gender=gender,
+                total_price=total_price,
+            )
+            # Save the booking object to the database
+            booking.save()
+
+        # Redirect to a success page or wherever you want
+        return redirect('booking_success')
+
+    return render(request, 'passengers.html')
+
+
+def payments_view(request):
+    return render(request, 'payments.html')
+
+  
 
 
 

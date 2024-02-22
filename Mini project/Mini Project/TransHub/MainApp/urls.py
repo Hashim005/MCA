@@ -52,7 +52,7 @@ urlpatterns = [
     path('bus-seat-map/', views.bus_seat_map, name='bus_seat_map'),
     path('book-seat/', views.book_seat, name='book_seat'),
     path('find_trip/',views.find_trip,name='find_trip'),
-    path('schedule_view_page/', views.schedule_view_page, name='schedule_view_page'),
+    path('schedule_view_page/<str:journey_date>/', views.schedule_view_page, name='schedule_view_page'),
 
     path('submit_feedback/', views.submit_feedback, name='submit_feedback'),
     path('feedback_thankyou/', views.feedback_thankyou, name='feedback_thankyou'), 
@@ -62,6 +62,11 @@ urlpatterns = [
     # path('seat_reservation/<str:code>/<str:seats>/<int:total>/', views.seat_reservation, name='seat_reservation'),
 
     # path('passenger_details/', views.passenger_details, name='passenger_details'),
-    path('seat_reservation',views.seat_resevation, name='seat_reservation'),
+    path('seat_reservation/<str:schedule_code>/', views.seat_reservation, name='seat_reservation'),
+
+    path('passengers/', views.passengers, name='passengers'),
+    path('payments/', views.payments_view, name='payments'),
+    path('bookings/create/', views.create_booking, name='create_booking'),
+
   
 ]

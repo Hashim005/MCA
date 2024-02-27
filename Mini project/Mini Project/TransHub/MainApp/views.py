@@ -854,8 +854,8 @@ def passengers(request):
 def payments_view(request):
     return render(request, 'payments.html')
 
-  
-
+def index1(request):
+    return render(request, 'index1.html')
 
 
 

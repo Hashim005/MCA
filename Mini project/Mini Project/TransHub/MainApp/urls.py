@@ -1,3 +1,4 @@
+
 from django.urls import path
 from . import views
 from django.contrib.auth.views import PasswordResetView,PasswordResetDoneView,PasswordResetConfirmView,PasswordResetCompleteView
@@ -69,6 +70,7 @@ urlpatterns = [
     path('passengers/', views.passengers, name='passengers'),
     path('payments/', views.payments_view, name='payments'),
     path('bookings/create/', views.create_booking, name='create_booking'),
+    path('index1/', views.index1, name='index1'),
 
   
 ]

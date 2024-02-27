@@ -14,7 +14,7 @@ from django.db.models import Q
 from django.contrib import messages
 from .models import Users, UserProfile
 from datetime import datetime
-
+from .models import Booking
 # from django.http import HttpResponse
 
 @never_cache
@@ -693,9 +693,9 @@ def adminfeedback(request):
     feedback_list = Feedback.objects.all()
     return render(request, 'adminfeedback.html', {'feedback_list': feedback_list})
 
-from .models import Booking
+# from .models import Booking
 
-def seat_reservation(request, schedule_code):
+def seat_reservation(request, schedule_code, schedule_id):
     user = request.user
     user_profile = user.userprofile
     
@@ -705,13 +705,15 @@ def seat_reservation(request, schedule_code):
     context = {
         'user_profile': user_profile,
         'bookings_count': bookings_count,
+        'bus_id': schedule_id,
+        'schedule_code': schedule_code
         # Other context variables for bus seat reservation
         # ...
     }
     return render(request, 'seat_reservation.html', context)
 
 from django.http import JsonResponse
-from .models import Booking
+# from .models import Booking
 
 def create_booking(request):
     if request.method == 'POST' and request.headers.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
@@ -730,7 +732,7 @@ def create_booking(request):
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
 from django.http import JsonResponse
-from .models import Booking
+# from .models import Booking
 
 def create_booking(request):
     if request.method == 'POST' and request.headers.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
@@ -747,46 +749,106 @@ def create_booking(request):
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Booking, Schedule
+from .models import Schedule
 
 from django.shortcuts import render
 
 # views.py
 from django.shortcuts import render, redirect
-from .models import Booking  # Import the Booking model
+# from .models import Booking  # Import the Booking model
 
-def passengers(request):
+from django.shortcuts import render, redirect
+# from .models import Booking
+from django.shortcuts import render, redirect
+# from .models import Booking
+from django.shortcuts import render, redirect
+# from .models import Booking
+from django.shortcuts import render, redirect
+# from .models import Booking
+from django.shortcuts import render, redirect
+# from .models import Booking
+
+from django.shortcuts import render, redirect
+# from .models import Booking
+
+
+from django.http import JsonResponse
+
+from django.shortcuts import render, HttpResponse, redirect
+from django.http import JsonResponse
+import json
+
+def seatReservation(request):
     if request.method == 'POST':
-        num_seats = int(request.POST.get('num_seats'))
+        data_list_json = request.POST.get('data_list')
+        bus_Id = int(request.POST['bus_id'])
+        schedule_Id = int(request.POST['schedule_code'])
 
-        # Loop through each passenger form submitted
-        for i in range(1, num_seats + 1):
-            passenger_name = request.POST.get(f'name{i}')
-            age = request.POST.get(f'age{i}')
-            phone_number = request.POST.get(f'phone{i}')
-            email_id = request.POST.get(f'email{i}')
-            seat_no = request.POST.get(f'seatNumber{i}')
-            gender = request.POST.get(f'gender{i}')
-            total_price = request.POST.get(f'price{i}')  # Example field for total price
+        bus = Bus.objects.get(pk=bus_Id)
+        schedule = Schedule.objects.get(code=schedule_Id) 
+        
+        # Check if data_list_json is not empty or None
+        if data_list_json:
+            data_list = json.loads(data_list_json)
+            print(data_list)
+            
+            # Assuming Seat_map is your Django model
+            if data_list:  # Check if data_list is not empty
+                for i in data_list:
+                    seatMap = Seat_map()
+                    seatMap.seat_number = i 
+                    seatMap.bus =  bus # FK
+                    seatMap.schedule =  schedule # FK
+                    seatMap.booked_by = request.user
+                    seatMap.save()
 
-            # Create and save Booking object
-            booking = Booking.objects.create(
-                schedule=None,  # You need to specify the schedule here
-                passenger_name=passenger_name,
-                age=age,
-                phone_number=phone_number,
-                email_id=email_id,
-                seat_no=seat_no,
-                gender=gender,
-                total_price=total_price,
-            )
-            # Save the booking object to the database
-            booking.save()
+                return redirect("passengers")  # Redirect to passengers page if at least one seat is selected
+            else:
+                error_message = 'No seats selected'
+                return render(request, 'seat_reservation.html', {'error_message': error_message})  # Render the same page with an error message
+        else:
+            error_message = 'No data received'
+            return render(request, 'seat_reservation.html', {'error_message': error_message})  # Render the same page with an error message
+    else:
+        return HttpResponse("no data found")
+ 
+from django.views.decorators.csrf import csrf_exempt
+import razorpay
 
-        # Redirect to a success page or wherever you want
-        return redirect('booking_success')
+@csrf_exempt
+def passengers(request):
+    seatMap = Seat_map.objects.filter(booked_by_id=request.user.id)
+    total_amount=0
+    for i in seatMap:
+        total_amount += i.schedule.fare
+    context = {
+        "seatMap": seatMap,
+        "total_amount": total_amount,
+        "order_id": False
+    }
+    if request.method == 'POST':
+        for i in seatMap:
+            name = request.POST[f"name{i.seat_number}"]
+            
+        return HttpResponse(name)
+    else:
+        client = razorpay.Client(auth=("rzp_test_xu07alXWd7WWYY", "t3tfAmUiPs6ycNF1Jk2xn3uo"))     
 
-    return render(request, 'passengers.html')
+        data_info = {
+            "amount": 50000,
+            "currency": "INR",
+            "receipt": "receipt#1",
+            "partial_payment": False,
+            "notes": {
+                "key1": "value3",
+                "key2": "value2"
+                }  
+        }
+        payment = client.order.create(data=data_info)
+        context['order_id'] = payment['id']
+
+        return render(request, 'passengers.html', context)  # Render the form page for GET requests
+
 
 
 def payments_view(request):

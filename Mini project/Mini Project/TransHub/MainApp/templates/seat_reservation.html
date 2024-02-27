@@ -257,12 +257,18 @@
                                 <h3>Seat Selection</h3>
                             </div>
                             <div class="card-body">
-                                <div class="d-flex align-items-center mb-3">
-                                    <p class="mr-2">Selected Seats:</p>
-                                    <p id="selectedSeatsDisplay"></p>
-                                </div>
-                                <button type="button" class="btn btn-primary btn-sm" id="selectBtn">Book</button>
-                                <input type="hidden" id="selectedSeatCount" name="selectedSeatCount" value="">
+                                <form action="{% url 'seatReservation' %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="d-flex align-items-center mb-3">
+                                        <p class="mr-2">Selected Seats:</p>
+                                        <p id="selectedSeatsDisplay"></p>
+                                        <input type="hidden" name="data_list" id="data_list_input">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm">Book</button>
+                                    <input type="hidden" name="selectedSeatCount" id="selectedSeatCount" value="">
+                                    <input type="hidden" name="bus_id" value="{{ bus_id }}">
+                                    <input type="hidden" name="schedule_code" value="{{ schedule_code }}">
+                                </form>
 
                             </div>
                             
@@ -322,6 +328,7 @@
 
                     // Uncomment the next line if you want to see selected seat numbers in console
                     // console.log(selectedSeatNumbers);
+                    document.getElementById('data_list_input').value = JSON.stringify(selectedSeatNumbers);
                 }
             });
         });
@@ -357,6 +364,8 @@ $(document).ready(function() {
         });
     });
 });
+
+
 
     </script>
     <!-- Add a button to trigger the function to print the number of selected seats -->

@@ -77,7 +77,7 @@ class Seat_map(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
     date = models.DateField(default=timezone.now)
     booked_seat = models.BooleanField(default=False)
-    booked_by = models.ForeignKey(Users, on_delete=models.SET_NULL, null=True, blank=True)
+    booked_by = models.ForeignKey(Users, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f"{self.seat_number} - {self.bus} - {self.schedule}"
@@ -92,16 +92,14 @@ class Feedback(models.Model):
 
 
 class Booking(models.Model):
-    book_id = models.AutoField(primary_key=True)
-    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True)
     passenger_name = models.CharField(max_length=255, blank=True, null=True)
     age = models.PositiveIntegerField(blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     email_id = models.EmailField(unique=True, null=True)
-    seat_no = models.CharField(max_length=10, blank=True, null=True)
+    seatMap = models.ForeignKey(Seat_map, on_delete=models.CASCADE, null=True)
     gender = models.CharField(max_length=10, blank=True, null=True)
-    total_price = models.CharField(max_length=10, blank=True, null=True)  # Example field for total price
-    seat_no_count = models.IntegerField(default=0)  # Field to store the count of selected seats
+    total_price = models.CharField(max_length=10, blank=True, null=True)  
 
     def __str__(self): 
         return f"Booking ID: {self.book_id} - Passenger: {self.passenger_name} - Schedule: {self.schedule}"

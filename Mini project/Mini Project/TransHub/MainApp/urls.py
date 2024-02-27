@@ -3,7 +3,7 @@ from . import views
 from django.contrib.auth.views import PasswordResetView,PasswordResetDoneView,PasswordResetConfirmView,PasswordResetCompleteView
 
 urlpatterns = [
-    path('', views.showIndex, name='showindex'),
+    path('', views.Home, name='showindex'),
     path('SignUp/', views.SignUp,name='signup'),
     path('about/', views.about, name='about'),
     path('login/', views.Log, name='login'),
@@ -62,8 +62,10 @@ urlpatterns = [
     # path('seat_reservation/<str:code>/<str:seats>/<int:total>/', views.seat_reservation, name='seat_reservation'),
 
     # path('passenger_details/', views.passenger_details, name='passenger_details'),
-    path('seat_reservation/<str:schedule_code>/', views.seat_reservation, name='seat_reservation'),
+    path('seat_reservation/<str:schedule_code>/<int:schedule_id>/', views.seat_reservation, name='seat_reservation'),
 
+
+    path('seatReservation/', views.seatReservation, name='seatReservation'),
     path('passengers/', views.passengers, name='passengers'),
     path('payments/', views.payments_view, name='payments'),
     path('bookings/create/', views.create_booking, name='create_booking'),

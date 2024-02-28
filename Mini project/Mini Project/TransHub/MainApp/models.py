@@ -6,10 +6,12 @@ class Users(AbstractUser):
     class Role(models.TextChoices):
         ADMIN="ADMIN",'Admin'
         STAFF="STAFF",'Staff'
-        USER="USER",'User'
+        USER="USER",'User',
+        WAREHOUSE="WAREHOUSE",'Warehouse'
         
     role=models.CharField(max_length=15,default='USER')
     phone_number = models.CharField(max_length=15, blank=True, null=True)
+    
 
     def __str__(self):
         return self.email
@@ -103,6 +105,17 @@ class Booking(models.Model):
 
     def __str__(self): 
         return f"Booking ID: {self.book_id} - Passenger: {self.passenger_name} - Schedule: {self.schedule}"
+    
+class Address(models.Model):
+    user = models.OneToOneField(Users, on_delete=models.CASCADE, related_name='address')
+    street = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f"{self.street}, {self.city}, {self.state}, {self.country} - {self.postal_code}"
 
 
     

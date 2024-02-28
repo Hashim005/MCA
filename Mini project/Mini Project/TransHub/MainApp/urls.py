@@ -71,6 +71,9 @@ urlpatterns = [
     path('payments/', views.payments_view, name='payments'),
     path('bookings/create/', views.create_booking, name='create_booking'),
     path('index1/', views.index1, name='index1'),
-
-  
+    path('warehoseindex/', views.warehouseindex, name='warehoseindex'),
+    path('warehosueregister/', views.warehouse_signup_page, name='warehouseregister'),
+    path('terms_and_condition/', views.terms_and_condition, name='terms_and_condition'),
+    path('warehouselogin/', views.warehouse_login_page, name='warehouselogin'),
+ 
 ]

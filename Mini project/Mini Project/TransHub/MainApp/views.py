@@ -857,9 +857,37 @@ def payments_view(request):
 def index1(request):
     return render(request, 'index1.html')
 
+def warehouseindex(request):
+    return render(request, 'warehouseindex.html')
 
+def warehouse_signup_page(request):
+    if request.method == 'POST':
+            username = request.POST['fullname']
+            email = request.POST['email']
+            phone = request.POST.get('phone')
+            address = request.POST.get('address')
+            password = request.POST['password']
+            confirm_password = request.POST['confirm_password']
+            role='user'
 
+            if password != confirm_password:
+                return render(request, warehouseregister.html)
+            user = Users(username=username,phone_number=phone,address=address, email=email,role=role)
+            # password set
+            user.set_password(password)
+            #save the user to database
+            user.save()
+            UserProfile.objects.create(user=user)
+            return redirect('')
+    return render(request, 'warehouseregister.html')
 
+def terms_and_condition(request):
+    return render(request, 'terms_and_condition.html')
+
+def warehouse_login_page(request):
+    return render(request, 'warehouselogin.html')
+   
+    
 
 
 

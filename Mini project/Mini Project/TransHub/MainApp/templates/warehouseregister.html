@@ -778,19 +778,23 @@
 <body>
 	<!-- main -->
 	<div class="main-w3layouts wrapper">
-		<h1>Creative SignUp Form</h1>
+		<h1>Warehouse SignUp Form</h1>
 		<div class="main-agileinfo">
 			<div class="agileits-top">
-				<form action="#" method="post">
+				<form action="{% url 'warehouseregister' %}" method="post">
+          {% csrf_token %}
 					<input type="text" id="fullname" name="fullname"placeholder="Username" required="">
-					<input class="text email" type="email" name="email" placeholder="Email" required="">
+          <div id="fullname-error" style="color: red; display: none;">Invalid fullname format. starting not use spacial symbol or numbers</div>
+					<input class="text email"id="email" type="email" name="email" placeholder="Email" required="">
+          <div id="email-error" style="color: red; display: none;">Invalid email format</div>
           <input class="text" type="text" id="phone" name="phone" placeholder="phone" required=""><br>
+          <div id="phone-error" style="color: red; display: none;">Invalid phone number format.phone number starting with +91</div>
           <input class="text" type="text" id="address" name="address" placeholder="address" required=""><br>
           <input type="text" id="street" name="street"placeholder="Street" required>
           <input type="text" id="city" name="city" placeholder="City" required>
           <input type="text" id="state" name="state" placeholder="State" required>
           <input type="text" id="country" name="country"placeholder="Country" required>
-          <input type="text" id="postal_code" name="postal_code" placeholder="postal code" required>
+          <input type="text" id="postal_code" name="postal_code" placeholder="postal code" required><br>
 					<input class="text" type="password" name="password" placeholder="Password" required="">
 					<input class="text w3lpass" type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required="">
 					<div class="wthree-text">
@@ -871,6 +875,113 @@
     <script>
         
     </script> {% endcomment %}
+
+ 
+
+    <script>
+      // Function to validate the fullname field
+      function validateFullName() {
+          var fullnameInput = document.getElementById("fullname");
+          var fullname = fullnameInput.value.trim();
+  
+          // Regular expression to match the allowed format
+          var regex = /^[a-zA-Z]{1,20}(?:\s[a-zA-Z]{1,20}){0,2}$/;
+  
+          // Check if the fullname matches the pattern
+          if (!regex.test(fullname)) {
+              // If not valid, display an error message
+              fullnameInput.setCustomValidity("Invalid fullname format. no starting special symbol or numbers");
+              return false;
+          } else {
+              // If valid, clear any previous error message
+              fullnameInput.setCustomValidity("");
+              return true;
+          }
+      }
+  
+      // Add event listener to the fullname input to trigger validation on input change
+      document.getElementById("fullname").addEventListener("input", function() {
+          // Validate fullname on input change
+          validateFullName();
+  
+          // Display error message if input is invalid
+          var errorMessage = document.getElementById("fullname-error");
+          if (!validateFullName()) {
+              errorMessage.style.display = "block";
+          } else {
+              errorMessage.style.display = "none";
+          }
+      });
+
+
+      function validateEmail() {
+        var emailInput = document.getElementById("email");
+        var email = emailInput.value.trim();
+
+        // Regular expression to match the email format
+        var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        // Check if the email matches the pattern
+        if (!regex.test(email)) {
+            // If not valid, display an error message
+            emailInput.setCustomValidity("Invalid email format. Please enter a valid email address.");
+            return false;
+        } else {
+            // If valid, clear any previous error message
+            emailInput.setCustomValidity("");
+            return true;
+        }
+    }
+
+    // Add event listener to the email input to trigger validation on input change
+    document.getElementById("email").addEventListener("input", function() {
+        // Validate email on input change
+        validateEmail();
+
+        // Display error message if input is invalid
+        var errorMessage = document.getElementById("email-error");
+        if (!validateEmail()) {
+            errorMessage.style.display = "block";
+        } else {
+            errorMessage.style.display = "none";
+        }
+    });
+
+    function validatePhoneNumber() {
+      var phoneInput = document.getElementById("phone");
+      var phoneNumber = phoneInput.value.trim();
+
+      // Regular expression to match the phone number format
+      var regex = /^\+91\d{10}$/;
+
+      // Check if the phone number matches the pattern
+      if (!regex.test(phoneNumber)) {
+          // If not valid, display an error message
+          phoneInput.setCustomValidity("Invalid phone number format. Please enter a valid phone number starting with +91 and followed by 10 digits.");
+          return false;
+      } else {
+          // If valid, clear any previous error message
+          phoneInput.setCustomValidity("");
+          return true;
+      }
+  }
+
+  // Add event listener to the phone number input to trigger validation on input change
+  document.getElementById("phone").addEventListener("input", function() {
+      // Validate phone number on input change
+      validatePhoneNumber();
+
+      // Display error message if input is invalid
+      var errorMessage = document.getElementById("phone-error");
+      if (!validatePhoneNumber()) {
+          errorMessage.style.display = "block";
+      } else {
+          errorMessage.style.display = "none";
+      }
+  });
+  </script>
+
+ 
     
 </body>
 </html>

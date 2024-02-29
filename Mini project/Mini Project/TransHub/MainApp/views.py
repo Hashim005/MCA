@@ -6,7 +6,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
-from .models import Bus, Category, Location, Schedule, Users,Seat_map
+from .models import Bus, Category, Location, Schedule, Users,Seat_map,Address
 from TransHub.settings import EMAIL_HOST_USER
 from .models import Users
 from django.core.mail import send_mail
@@ -862,24 +862,54 @@ def warehouseindex(request):
 
 def warehouse_signup_page(request):
     if request.method == 'POST':
-            username = request.POST['fullname']
-            email = request.POST['email']
-            phone = request.POST.get('phone')
-            address = request.POST.get('address')
-            password = request.POST['password']
-            confirm_password = request.POST['confirm_password']
-            role='user'
+        # Extract user registration data from the form
+        username = request.POST.get('fullname')
+        email = request.POST.get('email')
+        phone_number = request.POST.get('phone')
+        address = request.POST.get('address')
+        street = request.POST.get('street')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        country = request.POST.get('country')
+        postal_code = request.POST.get('postal_code')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
 
-            if password != confirm_password:
-                return render(request, warehouseregister.html)
-            user = Users(username=username,phone_number=phone,address=address, email=email,role=role)
-            # password set
-            user.set_password(password)
-            #save the user to database
+        # Check if passwords match
+        if password == confirm_password:
+            # Create the user instance
+            user = Users.objects.create_user(username=username, email=email, password=password,phone_number=phone_number,role='Warehouse')
+            
+          
+
+            # Create the address instance
+            user_address = Address.objects.create(
+                user=user,
+                address=address,
+                street=street,
+                city=city,
+                state=state,
+                country=country,
+                postal_code=postal_code
+            )
+
+
             user.save()
-            UserProfile.objects.create(user=user)
-            return redirect('')
-    return render(request, 'warehouseregister.html')
+           
+            user_address.save()
+
+            # No need to call save() on user, profile, and user_address separately,
+            # since create() method already saves the instances to the database
+
+            # Redirect to a success page or any other page
+            return redirect('warehouselogin')
+        else:
+            # Passwords don't match, handle accordingly (e.g., show an error message)
+            # For simplicity, let's just return a HttpResponse with an error message
+            return HttpResponse('Passwords do not match')
+    else:
+        # Render the registration form
+        return render(request, 'warehouseregister.html')
 
 def terms_and_condition(request):
     return render(request, 'terms_and_condition.html')

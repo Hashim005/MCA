@@ -52,22 +52,72 @@ def SignUp(request):
             
     return render(request,'SignUp.html')
 
+# def Log(request):
+#     if request.method == "POST":
+#          username = request.POST['username']
+#          user_password = request.POST['password']
+#          user = authenticate(username=username, password=user_password)
+#          if user is not None:
+#             if user.is_superuser:
+#                 login(request, user)
+#                 request.session['username'] = username
+#                 return redirect("Admin_Home")     
+#             login(request, user)
+#             return redirect('Home')
+#          else:
+#               return render(request, 'login.html', {'Error_message': 'invalid creadential!!'})
+    
+#     return render(request,'login.html')
+
+
+
 def Log(request):
     if request.method == "POST":
-         username = request.POST['username']
-         user_password = request.POST['password']
-         user = authenticate(username=username, password=user_password)
-         if user is not None:
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            print("User role:", user.role)  # Print user role for debugging
             if user.is_superuser:
                 login(request, user)
                 request.session['username'] = username
                 return redirect("Admin_Home")
-            login(request, user)
-            return redirect('Home')
-         else:
-              return render(request, 'login.html', {'Error_message': 'invalid creadential!!'})
-    
-    return render(request,'login.html')
+            elif user.role == 'Warehouse':
+                print("Redirecting to index1")  # Print debug message
+                login(request, user)
+                request.session['username'] = username
+                return redirect("index1")
+            else:
+                login(request, user)
+                request.session['username'] = username
+                return redirect('Home')
+    else:
+        return render(request, 'login.html')
+
+
+
+# def Log(request):
+#     if request.method == "POST":
+#         username = request.POST.get('username')
+#         user_password = request.POST.get('password')
+#         user = authenticate(username=username, password=user_password)
+#         if user is not None:
+#             if user.is_superuser:
+#                 login(request, user)
+#                 request.session['username'] = username
+#                 return redirect("Admin_Home")
+#             else:
+#                 request.session['username'] = username
+#                 login(request, user)
+#                 if user.role == 'WAREHOUSE':
+#                     return redirect('warehouselogin')
+#                 else:
+#                     return redirect('Home')
+#         else:
+#             return render(request, 'login.html', {'Error_message': 'Invalid credentials!!'})
+#     else:
+#         return render(request, 'login.html')  # Return login page for GET requests
+
     
 def logout_user(request):
      if request.user.is_authenticated:

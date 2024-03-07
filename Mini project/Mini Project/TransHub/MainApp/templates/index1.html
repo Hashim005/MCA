@@ -15,6 +15,7 @@
     <link rel="shortcut icon" href="{% static 'MainApp/images/ftco-32x32.png' %}">
 
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,900|Oswald:300,400,700" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'MainApp/fonts/icomoon/style.css' %}">
 
     <link rel="stylesheet" href="{% static 'MainApp/css/bootstrap.min.css' %}">
@@ -33,6 +34,43 @@
     <link rel="stylesheet" href="{% static 'MainApp/css/aos.css' %}">
 
     <link rel="stylesheet" href="{% static 'MainApp/css/style.css' %}">
+
+    <style>
+      .nav-container {
+        background: #f0f0f0; /* Light grey background */
+        overflow: auto; /* Clears the float */
+        padding: 10px 0; /* Some padding around the items */
+    }
+
+    /* Styling for the login link */
+    #logout {
+        float: right; /* Position to the right */
+        font-family: 'Arial', sans-serif; /* Stylish font */
+        font-size: 16px; /* Adjust as needed */
+        color: #007bff; /* Bootstrap primary color for example */
+        text-decoration: none; /* Remove underline from links */
+        padding: 5px 15px; /* Some padding for a nicer look */
+        background-color: #ffffff; /* White background */
+        border: 1px solid #ddd; /* Light grey border */
+        border-radius: 5px; /* Rounded corners */
+        margin-left: 50px; /* Space from the right side */
+    }
+
+    /* Add hover effect */
+    #logout:hover {
+        background-color: #007bff; /* Change background on hover */
+        color: #ffffff; /* White text on hover */
+        text-decoration: none; /* Ensure no underline appears on hover */
+    }
+
+     /* Custom CSS for circle profile photo */
+     .profile-photo {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+    </style>
     
   </head>
   <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
@@ -68,9 +106,35 @@
                 <li><a href="#about-section" class="nav-link">About</a></li>
                 <li><a href="#news-section" class="nav-link">News</a></li>
                 <li><a href="#contact-section" class="nav-link">Contact</a></li>
-              </ul>
+                <li><a href="{% url 'warehoseindex' %}" id="logout">logout</a></li>
+
+                <li>
+                  <div class="container mt-4">
+                    <div class="row">
+                      <div class="col-12 text-end">
+                        <!-- Profile photo with dropdown -->
+                        <div class="dropdown">
+                          <a class="d-block profile-photo" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{% static 'MainApp/images/rohith.jpg' %}" class="img-fluid" alt="Profile Photo">
+                          </a>
+                          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
+                            <li><a class="dropdown-item" href="{% url 'warehouse_profile_page' %}">Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'warehoseindex' %}">Logout</a></li>
+                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+                </li>
+              </ul> 
+              
             </nav>
+            
           </div>
+          
 
 
           <div class="col-6 d-inline-block d-xl-none ml-md-0 py-3"><a href="#" class="site-menu-toggle js-menu-toggle text-white float-right"><span class="icon-menu h3"></span></a></div>
@@ -695,6 +759,7 @@
 
   
   <script src="{% static 'MainApp/js/main.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     
   </body>
 </html>

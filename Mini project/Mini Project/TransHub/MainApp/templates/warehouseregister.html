@@ -12,11 +12,19 @@
     <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
     <!-- Custom Theme files -->
     <link href="css/style.css" rel="stylesheet" type="text/css" media="all" />
-    <!-- //Custom Theme files -->
-    <!-- web font -->
-    <link href="//fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i" rel="stylesheet">
-    <!-- //web font -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Leaflet JavaScript -->
     <style>
+      {% comment %} .form-select {
+        background-color: transparent; /* Make background color transparent */
+        border: 1px solid #ced4da; /* Add a border to maintain visibility */
+        margin-top: 20px; /* Gap between each select input */
+        
+      }
+      #select{
+        color: #ffffff; /* Set label color to white */
+        margin-top: 20px; /* Add some space above the labels */
+      } {% endcomment %}
         html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, dl, dt, dd, ol, nav ul, nav li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
             margin: 0;
             padding: 0;
@@ -25,6 +33,8 @@
             font: inherit;
             vertical-align: baseline;
           }
+
+          
           
           article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
             display: block;
@@ -781,7 +791,7 @@
 		<h1>Warehouse SignUp Form</h1>
 		<div class="main-agileinfo">
 			<div class="agileits-top">
-				<form action="{% url 'warehouseregister' %}" method="post">
+				<form id="addressForm" action="{% url 'warehouseregister' %}" method="post">
           {% csrf_token %}
 					<input type="text" id="fullname" name="fullname"placeholder="Username" required="">
           <div id="fullname-error" style="color: red; display: none;">Invalid fullname format. starting not use spacial symbol or numbers</div>
@@ -790,6 +800,16 @@
           <input class="text" type="text" id="phone" name="phone" placeholder="phone" required=""><br>
           <div id="phone-error" style="color: red; display: none;">Invalid phone number format.phone number starting with +91</div>
           <input class="text" type="text" id="address" name="address" placeholder="address" required=""><br>
+          <div id="address-error" style="color: red; display: none;">wrong address.only letter not using special character or numbers</div>
+            {% comment %} <select class="form-select country" id="select" name="country" aria-label="Default select example" onchange="loadStates()">
+                <option selected>Select Country</option>
+            </select>
+            <select class="form-select state" id="select" name="state" aria-label="Default select example" onchange="loadCities()">
+                <option selected>Select State</option>
+            </select>
+            <select class="form-select city" id="select" name="city" aria-label="Default select example">
+                <option selected>Select City</option>
+            </select> {% endcomment %}
           <input type="text" id="street" name="street"placeholder="Street" required>
           <input type="text" id="city" name="city" placeholder="City" required>
           <input type="text" id="state" name="state" placeholder="State" required>
@@ -805,10 +825,10 @@
                             </a>
 						</label>
 						<div class="clear"> </div>
-					</div>
+					</div>  
 					<input type="submit" value="SIGNUP">
 				</form>
-				<p>Don't have an Account? <a href="#"> Login Now!</a></p>
+				<p>Don't have an Account? <a href="{% url 'login' %}"> Login Now!</a></p>
 			</div>
 		</div>
 		<!-- copyright -->
@@ -829,7 +849,6 @@
 	<!-- //main -->
 </body>
 </html>
-
 
 
 
@@ -877,8 +896,8 @@
     </script> {% endcomment %}
 
  
-
     <script>
+
       // Function to validate the fullname field
       function validateFullName() {
           var fullnameInput = document.getElementById("fullname");
@@ -979,9 +998,37 @@
           errorMessage.style.display = "none";
       }
   });
-  </script>
 
- 
-    
+
+  function validateAddress() {
+    var addressInput = document.getElementById("address");
+    var addressValue = addressInput.value.trim();
+
+    // Regular expression for validation: Only letters and spaces, 1-20 characters long
+    var regex = /^[A-Za-z\s]{1,20}$/;
+
+    if (!regex.test(addressValue)) {
+        // If address doesn't match the pattern, show error message
+        document.getElementById("address-error").style.display = "block";
+        addressInput.setCustomValidity("Invalid address.");
+    } else {
+        // If address matches the pattern, hide error message
+        document.getElementById("address-error").style.display = "none";
+        addressInput.setCustomValidity("");
+    }
+}
+
+// Adding event listener to validate address on each input
+document.getElementById("address").addEventListener("input", validateAddress);
+
+
+{% comment %} var config = {
+  cUrl: 'https://api.countrystatecity.in/v1/countries',
+  ckey: 'NHhvOEcyWk50N2Vna3VFTE00bFp3MjFKR0ZEOUhkZlg4RTk1MlJlaA=='
+} {% endcomment %}
+
+
+  </script>
+   
 </body>
 </html>

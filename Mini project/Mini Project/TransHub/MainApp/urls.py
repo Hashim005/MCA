@@ -4,7 +4,7 @@ from . import views
 from django.contrib.auth.views import PasswordResetView,PasswordResetDoneView,PasswordResetConfirmView,PasswordResetCompleteView
 
 urlpatterns = [
-    path('', views.Home, name='showindex'),
+    path('', views.showIndex, name='showindex'),
     path('SignUp/', views.SignUp,name='signup'),
     path('about/', views.about, name='about'),
     path('login/', views.Log, name='login'),
@@ -75,5 +75,16 @@ urlpatterns = [
     path('warehosueregister/', views.warehouse_signup_page, name='warehouseregister'),
     path('terms_and_condition/', views.terms_and_condition, name='terms_and_condition'),
     path('warehouselogin/', views.warehouse_login_page, name='warehouselogin'),
- 
+    path('warehouseprofile/', views.warehouse_profile_page, name='warehouse_profile_page'), 
+    path('dropdown/', views.drop_down, name='dropdown'),
+    path('admin_warehouse/', views.admin_warehouse, name='admin_warehouse'),
+    path('warehouse_staff/', views.warehouse_staff, name='warehouse_staff'),
+    path('warehouse_orders/', views.warehouse_orders, name="warehouse_orders"),
+    path('warehouse_products/', views.warehouse_products, name='warehouse_products'),
+
+    path('products/', views.view_products, name='view_products'),
+    path('products/add/', views.add_product, name='add_product'),
+    path('products/edit/<int:id>/', views.edit_product, name='edit_product'),
+    path('products/delete/<int:id>/', views.delete_product, name='delete_product'),
+
 ]

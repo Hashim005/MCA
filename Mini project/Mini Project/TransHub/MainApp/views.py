@@ -6,7 +6,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
-from .models import Bus, Category, Location, Schedule, Users,Seat_map,Address
+from .models import Bus, Category, Location, Schedule, Users,Seat_map,Address,Product
 from TransHub.settings import EMAIL_HOST_USER
 from .models import Users
 from django.core.mail import send_mail
@@ -70,6 +70,7 @@ def SignUp(request):
 #     return render(request,'login.html')
 
 
+from django.contrib import messages
 
 def Log(request):
     if request.method == "POST":
@@ -91,10 +92,12 @@ def Log(request):
                 login(request, user)
                 request.session['username'] = username
                 return redirect('Home')
+        else:
+            # Invalid username or password
+            messages.error(request, 'Invalid username or password')
+            return render(request, 'login.html')
     else:
         return render(request, 'login.html')
-
-
 
 # def Log(request):
 #     if request.method == "POST":
@@ -952,7 +955,7 @@ def warehouse_signup_page(request):
             # since create() method already saves the instances to the database
 
             # Redirect to a success page or any other page
-            return redirect('warehouselogin')
+            return redirect('login')
         else:
             # Passwords don't match, handle accordingly (e.g., show an error message)
             # For simplicity, let's just return a HttpResponse with an error message
@@ -966,10 +969,112 @@ def terms_and_condition(request):
 
 def warehouse_login_page(request):
     return render(request, 'warehouselogin.html')
-   
-    
+
+from django.contrib.auth.hashers import check_password
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def warehouse_profile_page(request):
+    user = request.user
+    if request.method == 'POST':
+        if 'current_password' in request.POST:
+            current_password = request.POST.get('current_password')
+            new_password = request.POST.get('new_password1')
+            repeat_password = request.POST.get('new_password2')
+
+            if check_password(current_password, user.password):
+                if new_password == repeat_password:
+                    user.set_password(new_password)
+                    user.save()
+                    return redirect('warehouse_profile_page')
+                else:
+                    error_message = "New password and repeat password do not match."
+            else:
+                error_message = "Current password is incorrect."
+
+            context = {
+                'username': user.username,
+                'email': user.email,
+                'phone_number': user.phone_number,
+                'error_message': error_message
+            }
+            return render(request, 'warehouseprofile.html', context)
+        elif 'username' in request.POST or 'email' in request.POST or 'phone_number' in request.POST:
+            user.username = request.POST.get('username')
+            user.email = request.POST.get('email')
+            user.phone_number = request.POST.get('phone_number')
+            user.save()
+            return redirect('warehouse_profile_page')
+    else:
+        context = {
+            'username': user.username,
+            'email': user.email,
+            'phone_number': user.phone_number
+        }
+        return render(request, 'warehouseprofile.html', context)
+
+def drop_down(request):
+    return render(request, "dropdownpage.html")
+
+def admin_warehouse(request):
+    return render(request,  "admin_warehouse.html")
 
 
+def warehouse_details(request):
+    return render(request, "warehouse_details.html")
+
+def warehouse_staff(request):
+    return render(request, "warehouse_staff.html")
+
+def warehouse_orders(request):
+    return render(request, "warehouse_orders.html")
+
+def warehouse_products(request):
+    return render(request, "warehouse_products.html")
+
+def view_products(request):
+    products = Product.objects.all()
+    return render(request, 'view_products.html', {'products': products})
+
+#product
+def add_product(request):
+    if request.method == 'POST':
+        # Directly accessing form data
+        name = request.POST.get('name')
+        category = request.POST.get('category')
+        quantity = request.POST.get('quantity')
+        
+        # Here, you should add your validation for name, category, and quantity
+        
+        # Creating a new product instance
+        Product.objects.create(name=name, category=category, quantity=quantity)
+        
+        return redirect('view_products')
+    else:
+        # If not a POST request, just redirect to view products or show an error
+        return redirect('view_products')
+
+def edit_product(request, id):
+    product = get_object_or_404(Product, id=id)
+    if request.method == 'POST':
+        # Updating product with form data
+        product.name = request.POST.get('name')
+        product.category = request.POST.get('category')
+        product.quantity = request.POST.get('quantity')
+        
+        # Save the updated product
+        product.save()
+        
+        return redirect('view_products')
+    else:
+        # If not a POST request, render edit form with product instance
+        return render(request, 'edit_product.html', {'product': product})
+
+def delete_product(request, id):
+    product = get_object_or_404(Product, id=id)
+    product.delete()
+    return redirect('view_products')
 
 
 

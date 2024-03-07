@@ -117,6 +117,21 @@ class Address(models.Model):
 
     def __str__(self):
         return f"{self.address}, {self.street}, {self.city}, {self.state}, {self.country} - {self.postal_code}"
+    
+
+
+CATEGORY = (
+    ('Toys', 'Toys'),
+    ('KitchenItems', 'KitchenItems'),
+    ('Stationary', 'Stationary'),
+)
+class Product(models.Model):
+     name = models.CharField(max_length=100, null=True)
+     category = models.CharField(max_length=200, choices=CATEGORY, null=True)
+     quantity = models.PositiveBigIntegerField(null=True)
+
+     def __str__(self):
+         return f'{self.name}-{self.quantity}'
 
 
     

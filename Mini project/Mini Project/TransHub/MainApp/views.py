@@ -6,7 +6,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
-from .models import Bus, Category, Location, Schedule, Users,Seat_map,Address,Product
+from .models import Bus, Category, Location, Schedule, Users,Seat_map,Address,Supplier,Stock
 from TransHub.settings import EMAIL_HOST_USER
 from .models import Users
 from django.core.mail import send_mail
@@ -15,6 +15,7 @@ from django.contrib import messages
 from .models import Users, UserProfile
 from datetime import datetime
 from .models import Booking
+from django.utils.text import slugify
 # from django.http import HttpResponse
 
 @never_cache
@@ -1033,49 +1034,69 @@ def warehouse_orders(request):
 def warehouse_products(request):
     return render(request, "warehouse_products.html")
 
-def view_products(request):
-    products = Product.objects.all()
-    return render(request, 'view_products.html', {'products': products})
+# for inventory purpose
+def inventory_view(request):
+    stocks = Stock.objects.filter(is_deleted=False)
+    context = {'stocks': stocks}
+    return render(request, 'inventory_view.html', context)
 
-#product
-def add_product(request):
+def add_stock(request):
     if request.method == 'POST':
-        # Directly accessing form data
         name = request.POST.get('name')
         category = request.POST.get('category')
+        brand = request.POST.get('brand')
         quantity = request.POST.get('quantity')
-        
-        # Here, you should add your validation for name, category, and quantity
-        
-        # Creating a new product instance
-        Product.objects.create(name=name, category=category, quantity=quantity)
-        
-        return redirect('view_products')
-    else:
-        # If not a POST request, just redirect to view products or show an error
-        return redirect('view_products')
+        cost_price = request.POST.get('costPrice')
+        image = request.FILES.get('image')
+        date_added = request.POST.get('dateAdded')
 
-def edit_product(request, id):
-    product = get_object_or_404(Product, id=id)
+        # Generate a unique SKU if not provided by the user
+        sku = request.POST.get('sku') or slugify(name)  # Example of generating SKU from name
+        
+        # Ensure the generated SKU is unique
+        if Stock.objects.filter(sku=sku).exists():
+            # Handle the case where the generated SKU already exists
+            # You might append a number or any other strategy to make it unique
+            sku = generate_unique_sku(sku)
+
+        stock = Stock(name=name, category=category, brand=brand, quantity=quantity,
+                      costPrice=cost_price, image=image, dateAdded=date_added, sku=sku)
+        stock.save()
+        return redirect('inventory_view')
+    else:
+        return HttpResponse('Method Not Allowed')
+
+def edit_stock(request, stock_id):
+    stock = get_object_or_404(Stock, id=stock_id)
     if request.method == 'POST':
-        # Updating product with form data
-        product.name = request.POST.get('name')
-        product.category = request.POST.get('category')
-        product.quantity = request.POST.get('quantity')
-        
-        # Save the updated product
-        product.save()
-        
-        return redirect('view_products')
-    else:
-        # If not a POST request, render edit form with product instance
-        return render(request, 'edit_product.html', {'product': product})
+        stock.name = request.POST.get('name', stock.name)
+        stock.category = request.POST.get('category', stock.category)
+        stock.brand = request.POST.get('brand', stock.brand)
+        stock.quantity = request.POST.get('quantity', stock.quantity)
+        stock.costPrice = request.POST.get('costPrice', stock.costPrice)
+        if 'image' in request.FILES:
+            stock.image = request.FILES['image']
+        stock.dateAdded = request.POST.get('dateAdded', stock.dateAdded)
+        stock.save()
+        return redirect('inventory_view')
+    context = {'stock': stock}
+    return render(request, 'edit_stock.html', context)
 
-def delete_product(request, id):
-    product = get_object_or_404(Product, id=id)
-    product.delete()
-    return redirect('view_products')
+def delete_stock(request, stock_id):
+    stock = get_object_or_404(Stock, pk=stock_id)
+    stock.is_deleted = True
+    stock.save()
+    return redirect('inventory_view')
 
+def add_stock_page(request):
+    # Render the add stock modal form
+    return render(request, 'add_stock.html')
+
+def edit_stock_page(request, stock_id):
+    # Render the edit stock modal form
+    stock = get_object_or_404(Stock, pk=stock_id)
+    context = {'stock': stock}
+    return render(request, 'edit_stock.html', context)
 
 
 

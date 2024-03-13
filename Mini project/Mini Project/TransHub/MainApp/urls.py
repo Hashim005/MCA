@@ -82,9 +82,10 @@ urlpatterns = [
     path('warehouse_orders/', views.warehouse_orders, name="warehouse_orders"),
     path('warehouse_products/', views.warehouse_products, name='warehouse_products'),
 
-    path('products/', views.view_products, name='view_products'),
-    path('products/add/', views.add_product, name='add_product'),
-    path('products/edit/<int:id>/', views.edit_product, name='edit_product'),
-    path('products/delete/<int:id>/', views.delete_product, name='delete_product'),
-
+    path('inventory_view/', views.inventory_view, name='inventory_view'),
+    path('add_stock/', views.add_stock, name='add_stock'),
+    path('edit_stock/<int:stock_id>/', views.edit_stock, name='edit_stock'),
+    path('delete_stock/<int:stock_id>/', views.delete_stock, name='delete_stock'),
+    path('add_stock_page/', views.add_stock_page, name='add_stock_page'),
+    path('edit_stock_page/<int:stock_id>/',views.edit_stock_page, name='edit_stock_page'),
 ]

@@ -120,18 +120,56 @@ class Address(models.Model):
     
 
 
+
+#contains suppliers
+class Supplier(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=150)
+    phone = models.CharField(max_length=12, unique=True)
+    address = models.CharField(max_length=200)
+    email = models.EmailField(max_length=254, unique=True)
+    gstin = models.CharField(max_length=15, unique=True)
+    is_deleted = models.BooleanField(default=False)
+
+    def __str__(self):
+	    return self.name
+
+#contain product
+BRAND_CHOICES = (
+    ('QuillCraft', 'QuillCraft'),
+    ('CreativeCanvas', 'CreativeCanvas'),
+    ('CalinaQuetient', 'CalinaQuetient'),
+    ('GastronomeGoods', 'GastronomeGoods'),
+    ('HotWheelsHaven', 'Hot Wheels Haven'),
+)
+
 CATEGORY = (
     ('Toys', 'Toys'),
     ('KitchenItems', 'KitchenItems'),
     ('Stationary', 'Stationary'),
 )
-class Product(models.Model):
-     name = models.CharField(max_length=100, null=True)
-     category = models.CharField(max_length=200, choices=CATEGORY, null=True)
-     quantity = models.PositiveBigIntegerField(null=True)
 
-     def __str__(self):
-         return f'{self.name}-{self.quantity}'
+class Stock(models.Model):
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, null=True)
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, null=True)
+    sku = models.CharField(max_length=50, unique=True)
+    category = models.CharField(max_length=200, choices=CATEGORY, null=True)
+    brand = models.CharField(max_length=50, choices=BRAND_CHOICES, null=True)
+    costPrice = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    sellingPrice = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    quantity = models.PositiveBigIntegerField(null=True)
+    minStockLevel = models.PositiveIntegerField(null=True)
+    maxStockLevel = models.PositiveIntegerField(null=True)
+    reorderPoint = models.PositiveIntegerField(null=True)
+    unitOfMeasurement = models.CharField(max_length=50, null=True)
+    image = models.ImageField(upload_to='stock_images/', null=True)  # Changed field to ImageField
+    description = models.TextField(null=True)
+    dateAdded = models.DateField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.name} ({self.brand}) - {self.quantity}'
 
 
     

@@ -88,4 +88,13 @@ urlpatterns = [
     path('delete_stock/<int:stock_id>/', views.delete_stock, name='delete_stock'),
     path('add_stock_page/', views.add_stock_page, name='add_stock_page'),
     path('edit_stock_page/<int:stock_id>/',views.edit_stock_page, name='edit_stock_page'),
+
+    # path('suppliers/', views.SupplierListView.as_view(), name='suppliers-list'),
+    # path('suppliers/new', views.SupplierCreateView.as_view(), name='new-supplier'),
+    # path('suppliers/<pk>/edit', views.SupplierUpdateView.as_view(), name='edit-supplier'),
+    # path('suppliers/<pk>/delete', views.SupplierDeleteView.as_view(), name='delete-supplier'),
+    # path('suppliers/<name>', views.SupplierView.as_view(), name='supplier'),
+
+    path('supplier_page/', views.supplier_page, name='supplier_page'),
+    path('add_supplier/', views.add_supplier, name='add_supplier'),
 ]

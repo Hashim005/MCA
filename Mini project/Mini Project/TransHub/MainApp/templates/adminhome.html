@@ -82,6 +82,32 @@
 					<span class="text">warehouse</span>
 				</a>
 			</li>
+			<li>
+				<a href="{% url 'inventory_view' %}">
+					<i class='bx bx-archive'></i> <!-- Assuming 'bx-archive' represents an inventory icon in Bootstrap -->
+					<span class="text">Inventory</span>
+				</a>
+			</li>
+			
+			<li>
+				<a href="#" id="supplierToggle">
+					<i class='bx bx-user'></i> <!-- Assuming 'bx-user' represents a suppliers icon in Bootstrap -->
+					<span class="text">Suppliers</span>
+				</a>
+				<ul class="collapse list-unstyled" id="supplierSubmenu">
+					<li>
+						<a class="sidebar-text sidebar-subitem sidebar-button" href="{% url 'new-supplier' %}">
+							<i class="fas fa-dot-circle"></i> Add New Supplier
+						</a>
+					</li>
+					<li>
+						<a class="sidebar-text sidebar-subitem sidebar-button" href="{% url 'suppliers-list' %}">
+							<i class="fas fa-dot-circle"></i> Suppliers List
+						</a>
+					</li>
+				</ul>
+			</li>
+		
 		</ul>
 		<ul class="side-menu">
 			<li>
@@ -168,6 +194,17 @@
    {% endblock scripts %}
 
 
-	
+   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const supplierToggle = document.getElementById('supplierToggle');
+        const supplierSubmenu = document.getElementById('supplierSubmenu');
+
+        supplierToggle.addEventListener('click', function(event) {
+            event.preventDefault();
+            supplierSubmenu.classList.toggle('show');
+        });
+    });
+</script>
+
 </body>
 </html>

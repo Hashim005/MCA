@@ -1,12 +1,14 @@
 from collections import UserDict
 import json
+from msilib.schema import ListView
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import login, authenticate, logout
+from django.views import View
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
-from .models import Bus, Category, Location, Schedule, Users,Seat_map,Address,Supplier,Stock
+from .models import BRAND_CHOICES, CATEGORY, Bus, Category, Location, Schedule, Users,Seat_map,Address,Supplier,Stock
 from TransHub.settings import EMAIL_HOST_USER
 from .models import Users
 from django.core.mail import send_mail
@@ -16,6 +18,14 @@ from .models import Users, UserProfile
 from datetime import datetime
 from .models import Booking
 from django.utils.text import slugify
+from django.views.generic import (
+    View, 
+    ListView,
+    CreateView,
+    UpdateView,
+    DeleteView
+)
+from django.contrib.messages.views import SuccessMessageMixin
 # from django.http import HttpResponse
 
 @never_cache
@@ -258,7 +268,7 @@ def deactivation_email(request):
 # views.py
 # views.py
 from django.shortcuts import render, redirect
-from .forms import SaveBus, SaveCategory, SaveLocation, SaveSchedule, UserProfileForm, AdditionalProfileForm
+from .forms import SaveBus, SaveCategory, SaveLocation, SaveSchedule, SupplierForm, UserProfileForm, AdditionalProfileForm
 
 def update_profile(request):
     try:
@@ -1037,8 +1047,17 @@ def warehouse_products(request):
 # for inventory purpose
 def inventory_view(request):
     stocks = Stock.objects.filter(is_deleted=False)
-    context = {'stocks': stocks}
+    context = {'stocks': stocks,
+               'CATEGORY': CATEGORY,
+               'BRAND_CHOICES': BRAND_CHOICES,
+               }
     return render(request, 'inventory_view.html', context)
+
+def generate_unique_sku(sku):
+    # Logic to generate a unique SKU if it already exists
+    # For example, you might append a number to make it unique
+    # Here's a simple example using slugify to generate a unique SKU
+    return slugify(sku)
 
 def add_stock(request):
     if request.method == 'POST':
@@ -1054,10 +1073,9 @@ def add_stock(request):
         sku = request.POST.get('sku') or slugify(name)  # Example of generating SKU from name
         
         # Ensure the generated SKU is unique
-        if Stock.objects.filter(sku=sku).exists():
-            # Handle the case where the generated SKU already exists
-            # You might append a number or any other strategy to make it unique
-            sku = generate_unique_sku(sku)
+        while Stock.objects.filter(sku=sku).exists():
+            # If the SKU already exists, modify it to make it unique
+            sku += '-1'  # You might want to modify this logic based on your requirements
 
         stock = Stock(name=name, category=category, brand=brand, quantity=quantity,
                       costPrice=cost_price, image=image, dateAdded=date_added, sku=sku)
@@ -1097,6 +1115,105 @@ def edit_stock_page(request, stock_id):
     stock = get_object_or_404(Stock, pk=stock_id)
     context = {'stock': stock}
     return render(request, 'edit_stock.html', context)
+
+
+# # shows a lists of all suppliers
+# class SupplierListView(ListView):
+#     model = Supplier
+#     template_name = "suppliers_list.html"
+#     queryset = Supplier.objects.filter(is_deleted=False)
+#     paginate_by = 10
+
+
+# # used to add a new supplier
+# class SupplierCreateView(SuccessMessageMixin, CreateView):
+#     model = Supplier
+#     form_class = SupplierForm
+#     success_url = ''
+#     success_message = "Supplier has been created successfully"
+#     template_name = "edit_supplier.html"
+    
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context["title"] = 'New Supplier'
+#         context["savebtn"] = 'Add Supplier'
+#         return context     
+
+
+# # used to update a supplier's info
+# class SupplierUpdateView(SuccessMessageMixin, UpdateView):
+#     model = Supplier
+#     form_class = SupplierForm
+#     success_url = ''
+#     success_message = "Supplier details has been updated successfully"
+#     template_name = "edit_supplier.html"
+    
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context["title"] = 'Edit Supplier'
+#         context["savebtn"] = 'Save Changes'
+#         context["delbtn"] = 'Delete Supplier'
+#         return context
+
+
+# # used to delete a supplier
+# class SupplierDeleteView(View):
+#     template_name = "delete_supplier.html"
+#     success_message = "Supplier has been deleted successfully"
+
+#     def get(self, request, pk):
+#         supplier = get_object_or_404(Supplier, pk=pk)
+#         return render(request, self.template_name, {'object' : supplier})
+
+#     def post(self, request, pk):  
+#         supplier = get_object_or_404(Supplier, pk=pk)
+#         supplier.is_deleted = True
+#         supplier.save()                                               
+#         messages.success(request, self.success_message)
+#         return redirect('suppliers-list')
+
+
+# # used to view a supplier's profile
+# class SupplierView(View):
+#     def get(self, request, name):
+#         supplierobj = get_object_or_404(Supplier, name=name)
+#         bill_list = PurchaseBill.objects.filter(supplier=supplierobj)
+#         page = request.GET.get('page', 1)
+#         paginator = Paginator(bill_list, 10)
+#         try:
+#             bills = paginator.page(page)
+#         except PageNotAnInteger:
+#             bills = paginator.page(1)
+#         except EmptyPage:
+#             bills = paginator.page(paginator.num_pages)
+#         context = {
+#             'supplier'  : supplierobj,
+#             'bills'     : bills
+#         }
+#         return render(request, 'supplier.html', context)
+    
+
+def supplier_page(request):
+    return render(request, "supplier/supplier_page.html") 
+
+def add_supplier(request):
+    if request.method == 'POST':
+        # Retrieving form data:
+        name = request.POST.get('name')
+        phone = request.POST.get('phone')
+        address = request.POST.get('address')
+        email = request.POST.get('email')
+        gstin = request.POST.get('gstin')
+
+        # Creating a new Supplier object and saving it to the database:
+        supplier = Supplier(name=name, phone=phone, address=address, email=email, gstin=gstin)
+        supplier.save()
+
+        # Redirecting to the supplier_page (make sure to define the URL name 'supplier_page' in your urls.py)
+        return redirect('supplier_page')
+    else:
+        # If not a POST request, just show the form page again (or you could direct to a different page)
+        return render(request, 'supplier/add_supplier.html')  # Replace 'your_form_template.html' with your actual form template
 
 
 

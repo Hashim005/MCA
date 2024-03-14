@@ -73,16 +73,16 @@
                         <div class="form-group">
                             <label for="category">Category</label>
                             <select class="form-control" id="category" name="category">
-                                {% for category in CATEGORY %}
-                                    <option value="{{ category.0 }}">{{ category.1 }}</option>
+                                {% for category_value, category_name in CATEGORY %}
+                                    <option value="{{ category_value }}">{{ category_name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="brand">Brand</label>
                             <select class="form-control" id="brand" name="brand">
-                                {% for brand in BRAND_CHOICES %}
-                                    <option value="{{ brand.0 }}">{{ brand.1 }}</option>
+                                {% for brand_value, brand_name in BRAND_CHOICES %}
+                                    <option value="{{ brand_value }}">{{ brand_name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -150,7 +150,6 @@
                                     <option value="{{ brand_value }}">{{ brand_name }}</option>
                                 {% endfor %}
                             </select>
-                            
                         </div>
                         <div class="form-group">
                             <label for="quantity">Quantity</label>

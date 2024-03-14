@@ -2,7 +2,7 @@
 from datetime import datetime
 from django import forms
 from django.contrib.auth.forms import UserChangeForm
-from .models import Bus, Category, Location, Schedule, UserProfile,Users
+from .models import Bus, Category, Location, Schedule, Supplier, UserProfile,Users
 
 class UserProfileForm(UserChangeForm):
     class Meta:
@@ -151,6 +151,28 @@ class SaveSchedule(forms.ModelForm):
             return location
         except:
             raise forms.ValidationError("Destination is not recognized.")
+        
+
+# form used for supplier
+class SupplierForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs.update({'class': 'textinput form-control', 'pattern' : '[a-zA-Z\s]{1,50}', 'title' : 'Alphabets and Spaces only'})
+        self.fields['phone'].widget.attrs.update({'class': 'textinput form-control', 'maxlength': '10', 'pattern' : '[0-9]{10}', 'title' : 'Numbers only'})
+        self.fields['email'].widget.attrs.update({'class': 'textinput form-control'})
+        self.fields['gstin'].widget.attrs.update({'class': 'textinput form-control', 'maxlength': '15', 'pattern' : '[A-Z0-9]{15}', 'title' : 'GSTIN Format Required'})
+    class Meta:
+        model = Supplier
+        fields = ['name', 'phone', 'address', 'email', 'gstin']
+        widgets = {
+            'address' : forms.Textarea(
+                attrs = {
+                    'class' : 'textinput form-control',
+                    'rows'  : '4'
+                }
+            )
+        }
+
 
 
 

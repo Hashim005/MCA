@@ -1198,6 +1198,9 @@ def supplier_page(request):
 
 def add_supplier(request):
     if request.method == 'POST':
+        name = request.POST.get('name')
+        if Supplier.objects.filter(name=name).exists():
+            messages.error(request, 'Supplier with this name already exists.')
         # Retrieving form data:
         name = request.POST.get('name')
         phone = request.POST.get('phone')
@@ -1208,12 +1211,37 @@ def add_supplier(request):
         # Creating a new Supplier object and saving it to the database:
         supplier = Supplier(name=name, phone=phone, address=address, email=email, gstin=gstin)
         supplier.save()
+        messages.success(request, 'wait for admin approve!')
 
         # Redirecting to the supplier_page (make sure to define the URL name 'supplier_page' in your urls.py)
         return redirect('supplier_page')
     else:
         # If not a POST request, just show the form page again (or you could direct to a different page)
         return render(request, 'supplier/add_supplier.html')  # Replace 'your_form_template.html' with your actual form template
+    
+
+def request_accepting_page(request):
+    # Retrieve only pending supplier requests
+    pending_suppliers = Supplier.objects.filter(status='pending')
+    return render(request, 'supplier/request_accepting_page.html', {'suppliers': pending_suppliers})
+
+def accept_supplier(request):
+    if request.method == 'POST':
+        supplier_id = request.POST.get('supplier_id')
+        supplier = Supplier.objects.get(pk=supplier_id)
+        supplier.status = '1'  # '1' corresponds to "Accept" in your STATUS_CHOICES
+        supplier.save()
+
+        # Send email notification
+        send_mail(
+            'Supplier Request Approved',
+            'Your supplier request has been approved.',
+            'transhubcorporationltd@gmail.com',  # Change this to your admin email address
+            [supplier.email],
+            fail_silently=False,
+        )
+
+    return redirect('request_accepting_page')
 
 
 

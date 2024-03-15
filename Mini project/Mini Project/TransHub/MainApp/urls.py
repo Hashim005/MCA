@@ -97,4 +97,9 @@ urlpatterns = [
 
     path('supplier_page/', views.supplier_page, name='supplier_page'),
     path('add_supplier/', views.add_supplier, name='add_supplier'),
+    path('request_accepting_page/', views.request_accepting_page, name='request_accepting_page'),
+    path('accept_supplier/', views.accept_supplier, name='accept_supplier'),
+
+    
+    
 ]

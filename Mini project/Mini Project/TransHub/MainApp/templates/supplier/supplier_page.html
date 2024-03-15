@@ -23,6 +23,7 @@
     </style>
 </head>
 <body>
+   
     <div class="container"> <!-- Added a container for centering -->
         <div class="row justify-content-center"> <!-- This will center your column in the middle -->
             <div class="col-md-6"> <!-- Adjusted column size for medium devices and centered -->
@@ -45,5 +46,31 @@
               </div>
         </div>
     </div>
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endfor %}
+
+    <script>
+        // Using jQuery to wait for the document to be ready
+        $(document).ready(function(){
+            // Selecting all alerts and setting a timer to close them after 5 seconds
+            $(".alert").each(function(){
+                var alert = $(this);
+                setTimeout(function(){
+                    alert.alert('close');
+                }, 5000); // 5000 milliseconds = 5 seconds
+            });
+        });
+    </script>
+{% endif %}
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

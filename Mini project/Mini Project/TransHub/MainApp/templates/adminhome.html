@@ -88,6 +88,13 @@
 					<span class="text">Inventory</span>
 				</a>
 			</li>
+
+			<li>
+				<a href="{% url 'supplier_selection' %}">
+					<i class='bx bx-archive'></i> <!-- Assuming 'bx-archive' represents an inventory icon in Bootstrap -->
+					<span class="text">purchase-stock</span>
+				</a>
+			</li>
 			
 			<li>
 				<a href="#" id="supplierToggle">
@@ -96,12 +103,12 @@
 				</a>
 				<ul class="collapse list-unstyled" id="supplierSubmenu">
 					<li>
-						<a class="sidebar-text sidebar-subitem sidebar-button" href="{% url 'new-supplier' %}">
-							<i class="fas fa-dot-circle"></i> Add New Supplier
+						<a class="sidebar-text sidebar-subitem sidebar-button" href="{% url 'accept_supplier' %}">
+							<i class="fas fa-dot-circle"></i> supplier request
 						</a>
 					</li>
 					<li>
-						<a class="sidebar-text sidebar-subitem sidebar-button" href="{% url 'suppliers-list' %}">
+						<a class="sidebar-text sidebar-subitem sidebar-button" href="">
 							<i class="fas fa-dot-circle"></i> Suppliers List
 						</a>
 					</li>

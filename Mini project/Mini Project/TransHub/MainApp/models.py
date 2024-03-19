@@ -171,12 +171,66 @@ class Stock(models.Model):
     reorderPoint = models.PositiveIntegerField(null=True)
     unitOfMeasurement = models.CharField(max_length=50, null=True)
     image = models.ImageField(upload_to='stock_images/', null=True)  # Changed field to ImageField
-    description = models.TextField(null=True)
+    description = models.TextField(null=True, blank=True)
     dateAdded = models.DateField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.name} ({self.brand}) - {self.quantity}'
+    
+
+
+#contains the purchase bills made
+class PurchaseBill(models.Model):
+    billno = models.AutoField(primary_key=True)
+    time = models.DateTimeField(auto_now=True)
+    supplier = models.ForeignKey(Supplier, on_delete = models.CASCADE, related_name='purchasesupplier')
+
+    def __str__(self):
+	    return "Bill no: " + str(self.billno)
+
+    def get_items_list(self):
+        return PurchaseItem.objects.filter(billno=self)
+
+    def get_total_price(self):
+        purchaseitems = PurchaseItem.objects.filter(billno=self)
+        total = 0
+        for item in purchaseitems:
+            total += item.totalprice
+        return total
+
+#contains the purchase stocks made
+class PurchaseItem(models.Model):
+    billno = models.ForeignKey(PurchaseBill, on_delete = models.CASCADE, related_name='purchasebillno')
+    stockname = models.ForeignKey(Stock, on_delete = models.CASCADE, related_name='purchaseitem')
+    quantity = models.IntegerField(default=1)
+    perprice = models.IntegerField(default=1)
+    totalprice = models.IntegerField(default=1)
+
+    def __str__(self):
+	    return "Bill no: " + str(self.billno.billno) + ", Item = " + self.stockname.name
+
+
+# warehouse model
+class Warehouse(models.Model):
+    STATUS_CHOICES = (
+        ('1', 'Active'),
+        ('2', 'Inactive'),
+    )
+
+    name = models.CharField(max_length=100)
+    location = models.CharField(max_length=200)
+    total_capacity = models.DecimalField(max_digits=10, decimal_places=2)
+    available_capacity = models.DecimalField(max_digits=10, decimal_places=2)
+    contact_person_name = models.CharField(max_length=100)
+    contact_person_email = models.EmailField(max_length=254)
+    contact_person_phone = models.CharField(max_length=15)
+    date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default='1')
+
+    def __str__(self):
+        return self.name
+
 
 
     

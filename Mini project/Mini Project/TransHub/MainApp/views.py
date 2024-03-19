@@ -8,7 +8,7 @@ from django.views import View
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
-from .models import BRAND_CHOICES, CATEGORY, Bus, Category, Location, Schedule, Users,Seat_map,Address,Supplier,Stock
+from .models import BRAND_CHOICES, CATEGORY, Bus, Category, Location, Schedule, Users,Seat_map,Address,Supplier,Stock, Warehouse
 from TransHub.settings import EMAIL_HOST_USER
 from .models import Users
 from django.core.mail import send_mail
@@ -18,6 +18,7 @@ from .models import Users, UserProfile
 from datetime import datetime
 from .models import Booking
 from django.utils.text import slugify
+from django.views.decorators.http import require_http_methods
 from django.views.generic import (
     View, 
     ListView,
@@ -1068,6 +1069,7 @@ def add_stock(request):
         cost_price = request.POST.get('costPrice')
         image = request.FILES.get('image')
         date_added = request.POST.get('dateAdded')
+        description = request.POST.get('description') 
 
         # Generate a unique SKU if not provided by the user
         sku = request.POST.get('sku') or slugify(name)  # Example of generating SKU from name
@@ -1078,7 +1080,7 @@ def add_stock(request):
             sku += '-1'  # You might want to modify this logic based on your requirements
 
         stock = Stock(name=name, category=category, brand=brand, quantity=quantity,
-                      costPrice=cost_price, image=image, dateAdded=date_added, sku=sku)
+                      costPrice=cost_price, image=image, dateAdded=date_added, sku=sku, description=description)
         stock.save()
         return redirect('inventory_view')
     else:
@@ -1095,6 +1097,7 @@ def edit_stock(request, stock_id):
         if 'image' in request.FILES:
             stock.image = request.FILES['image']
         stock.dateAdded = request.POST.get('dateAdded', stock.dateAdded)
+        stock.description = request.POST.get('description', stock.description)
         stock.save()
         return redirect('inventory_view')
     context = {'stock': stock}
@@ -1116,6 +1119,25 @@ def edit_stock_page(request, stock_id):
     context = {'stock': stock}
     return render(request, 'edit_stock.html', context)
 
+def get_stock_details(request):
+    if request.method == 'GET' and 'stock_id' in request.GET:
+        stock_id = request.GET.get('stock_id')
+        try:
+            stock = Stock.objects.get(id=stock_id)
+            # Construct JSON response with stock details
+            data = {
+                'name': stock.name,
+                'description': stock.description,
+                'quantity': stock.quantity,
+                'cost_price': str(stock.costPrice),  # Convert DecimalField to string
+                'date_added': stock.dateAdded.strftime('%Y-%m-%d'),  # Format date as string
+                'image_url': stock.image.url,  # Assuming 'image' is an ImageField
+            }
+            return JsonResponse(data)
+        except Stock.DoesNotExist:
+            return JsonResponse({'error': 'Stock not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
 
 # # shows a lists of all suppliers
 # class SupplierListView(ListView):
@@ -1243,9 +1265,111 @@ def accept_supplier(request):
 
     return redirect('request_accepting_page')
 
+def reject_supplier(request):
+    if request.method == 'POST':
+        supplier_id = request.POST.get('supplier_id')
+        supplier = Supplier.objects.get(pk=supplier_id)
+        supplier.status = '3'  # '3' corresponds to "Reject" in your STATUS_CHOICES
+        supplier.save()
+
+        # Send email notification
+        send_mail(
+            'Supplier Request Rejected',
+            'Your supplier request has been rejected by the admin.',
+            'transhubcorporationltd@gmail.com',  # Change this to your admin email address
+            [supplier.email],
+            fail_silently=False,
+        )
+
+    return redirect('request_accepting_page')
 
 
+def sale_stock(request):
+    return render(request, 'purchases/sale_stock.html')
 
+def new_purchase(request):
+    return render(request, 'purchases/new_purchase.html')
+
+#warehouse
+def supplier_selection(request):
+    suppliers = Supplier.objects.all()
+    return render(request, 'purchases/supplier_selection.html', {'suppliers': suppliers, 'selected_supplier': None})
+
+def new_purchase(request):
+    if request.method == 'POST':
+        selected_supplier_id = request.POST.get('supplier')
+        selected_supplier = get_object_or_404(Supplier, id=selected_supplier_id)
+        stock_items = Stock.objects.filter(supplier=selected_supplier)
+        return render(request, 'purchases/new_purchase.html', {'selected_supplier': selected_supplier, 'stock_items': stock_items})
+    else:
+        return redirect('supplier_selection')
+    
+
+#warehouse
+def warehouse_view(request):
+    warehouses = Warehouse.objects.all()
+    return render(request, 'warehouse/warehouse_views.html', {'warehouses': warehouses})
+
+def add_warehouse(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        location = request.POST.get('location')
+        total_capacity = request.POST.get('total_capacity')
+        available_capacity = request.POST.get('available_capacity')
+        contact_person_name = request.POST.get('contact_person_name')
+        contact_person_email = request.POST.get('contact_person_email')
+        contact_person_phone = request.POST.get('contact_person_phone')
+        status = request.POST.get('status')
+        date = request.POST.get('date')
+
+        if Warehouse.objects.filter(name=name).exists():
+            messages.error(request, "A warehouse with this name already exists.")
+            return redirect('add_warehouse')
+        
+        warehouse = Warehouse.objects.create(
+            name=name,
+            location=location,
+            total_capacity=total_capacity,
+            available_capacity=available_capacity,
+            contact_person_name=contact_person_name,
+            contact_person_email=contact_person_email,
+            contact_person_phone=contact_person_phone,
+            status=status,
+            date=date
+        )
+        warehouse.save
+        messages.success(request, "Warehouse added successfully.")
+        return redirect('warehouse_view')
+    else:
+        return HttpResponse("Method Not Allowed", status=405)
+
+def edit_warehouse(request, pk):
+    warehouse = get_object_or_404(Warehouse, pk=pk)
+    if request.method == 'POST':
+        warehouse.name = request.POST.get('name')
+        warehouse.location = request.POST.get('location')
+        warehouse.total_capacity = request.POST.get('total_capacity')
+        warehouse.available_capacity = request.POST.get('available_capacity')
+        warehouse.contact_person_name = request.POST.get('contact_person_name')
+        warehouse.contact_person_email = request.POST.get('contact_person_email')
+        warehouse.contact_person_phone = request.POST.get('contact_person_phone')
+        warehouse.status = request.POST.get('status')
+        warehouse.date = request.POST.get('date')
+        warehouse.save()
+        return redirect('warehouse_view')
+    return HttpResponse("Method Not Allowed", status=405)
+
+def delete_warehouse(request, pk):
+    warehouse = get_object_or_404(Warehouse, pk=pk)
+    if request.method == 'POST':
+        warehouse.delete()
+        return redirect('warehouse_view')
+    return HttpResponse("Method Not Allowed", status=405)
+
+def search_warehouse(request):
+    search_text = request.GET.get('search_text')
+    warehouses = Warehouse.objects.filter(Q(name__icontains=search_text))
+    return render(request, 'warehouse/warehouse_views.html', {'warehouses': warehouses})
 
 
 

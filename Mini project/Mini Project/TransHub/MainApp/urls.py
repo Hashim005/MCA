@@ -88,6 +88,7 @@ urlpatterns = [
     path('delete_stock/<int:stock_id>/', views.delete_stock, name='delete_stock'),
     path('add_stock_page/', views.add_stock_page, name='add_stock_page'),
     path('edit_stock_page/<int:stock_id>/',views.edit_stock_page, name='edit_stock_page'),
+    path('get_stock_details/', views.get_stock_details, name='get_stock_details'),
 
     # path('suppliers/', views.SupplierListView.as_view(), name='suppliers-list'),
     # path('suppliers/new', views.SupplierCreateView.as_view(), name='new-supplier'),
@@ -99,7 +100,17 @@ urlpatterns = [
     path('add_supplier/', views.add_supplier, name='add_supplier'),
     path('request_accepting_page/', views.request_accepting_page, name='request_accepting_page'),
     path('accept_supplier/', views.accept_supplier, name='accept_supplier'),
+    path('reject_supplier/', views.reject_supplier, name='reject_supplier'),
 
+    path('sale_stock/', views.sale_stock, name='sale_stock'),
     
-    
+
+    path('supplier_selection/', views.supplier_selection, name='supplier_selection'),
+    path('new_purchase/', views.new_purchase, name='new_purchase'),
+
+    path('warehouse_view/', views.warehouse_view, name='warehouse_view'),
+    path('add/', views.add_warehouse, name='add_warehouse'),
+    path('edit/<int:pk>/', views.edit_warehouse, name='edit_warehouse'),
+    path('delete/<int:pk>/', views.delete_warehouse, name='delete_warehouse'),
+    path('search-warehouse/', views.search_warehouse, name='search_warehouse'),
 ]

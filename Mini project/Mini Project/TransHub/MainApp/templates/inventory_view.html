@@ -31,7 +31,7 @@
             {% for stock in stocks %}
             <tr>
                 <td>{{ stock.id }}</td>
-                <td>{{ stock.name }}</td>
+                <td><a href="#" class="stock-link" data-stock-id="{{ stock.id }}" data-toggle="modal" data-target="#stockDetailsModal">{{ stock.name }}</a></td>
                 <td>{{ stock.category }}</td>
                 <td>{{ stock.brand }}</td>
                 <td>{{ stock.quantity }}</td>
@@ -51,6 +51,32 @@
             {% endfor %}
         </tbody>
     </table>
+
+        <!-- Add this modal HTML code to your page -->
+    <div class="modal fade" id="stockDetailsModal" tabindex="-1" role="dialog" aria-labelledby="stockDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="stockDetailsModalLabel">Stock Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="stockDetailsContent">
+                        <!-- Stock details will be loaded here via AJAX -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    
 
     <!-- Add Stock Modal -->
     <div class="modal fade" id="addStockModal" tabindex="-1" role="dialog" aria-labelledby="addStockModalLabel" aria-hidden="true">
@@ -102,6 +128,10 @@
                             <label for="date_added">Date Added</label>
                             <input type="date" class="form-control" id="date_added" name="dateAdded" required>
                         </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea class="form-control" id="description" name="description"></textarea>
+                        </div>
                     </div>
                     
                     <div class="modal-footer">
@@ -113,6 +143,7 @@
         </div>
         <!-- Modal content for adding stock goes here -->
     </div>
+    
 
     <!-- Edit Stock Modals -->
     {% for stock in stocks %}
@@ -170,6 +201,10 @@
                             <label for="date_added">Date Added</label>
                             <input type="date" class="form-control" id="date_added" name="dateAdded" value="{{ stock.dateAdded }}" required>
                         </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea class="form-control" id="description" name="description" values="{{stock.description}}"></textarea>
+                        </div>
         
                     </div>
                     <div class="modal-footer">
@@ -199,6 +234,48 @@
                 $('#editStockModal' + stockId).load("/path/to/edit_stock/" + stockId + "/");
             });
         });
+
+       
+   
     </script>
+    
+    {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Function to handle click event on stock name link
+        $('.stock-link').click(function (e) {
+            e.preventDefault(); // Prevent default link behavior
+            var stockId = $(this).data('stock-id'); // Get the stock ID from data attribute
+            // AJAX request to fetch stock details
+            $.ajax({
+                type: 'GET',
+                url: '{% url "get_stock_details" %}',
+                data: {'stock_id': stockId},
+                dataType: 'json',
+                success: function (data) {
+                    // Populate modal body with received data
+                    $('#stockDetailsContent').html(`
+                        <div class="card" style="width: 18rem;">
+                            <img class="card-img-top" src="${data.image_url}" alt="${data.name}">
+                            <div class="card-body">
+                                <h5 class="card-title">${data.name}</h5>
+                                <p class="card-text">${data.description}</p>
+                                <p class="card-text">Quantity: ${data.quantity}</p>
+                                <p class="card-text">Cost Price: ${data.cost_price}</p>
+                                <p class="card-text">Date Added: ${data.date_added}</p>
+                            </div>
+                        </div>
+                    `);
+                    $('#stockDetailsModal').modal('show'); // Show the modal
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
+                    alert('Failed to load stock details. Please try again.');
+                }
+            });
+        });
+    });
+</script> {% endcomment %}
+    
 </body>
 </html>

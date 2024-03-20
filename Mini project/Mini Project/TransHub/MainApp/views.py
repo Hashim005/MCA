@@ -8,7 +8,7 @@ from django.views import View
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
-from .models import BRAND_CHOICES, CATEGORY, Bus, Category, Location, Schedule, Users,Seat_map,Address,Supplier,Stock, Warehouse
+from .models import BRAND_CHOICES, CATEGORY, Bus, Category, Location, Schedule, Users,Seat_map,Address,Supplier,Stock, Warehouse,WarehouseType
 from TransHub.settings import EMAIL_HOST_USER
 from .models import Users
 from django.core.mail import send_mail
@@ -1372,7 +1372,62 @@ def search_warehouse(request):
     return render(request, 'warehouse/warehouse_views.html', {'warehouses': warehouses})
 
 
+def storage_type(request):
+    storage_types = WarehouseType.objects.all()
+    warehouses = Warehouse.objects.all()
+    return render(request, 'warehouse/storage_type.html', {'storage_types': storage_types, 'warehouses': warehouses})
 
+def add_storage_type(request):
+    if request.method == 'POST':
+        type = request.POST.get('type')
+        rate = request.POST.get('rate')
+        capacity = request.POST.get('capacity')
+        count = request.POST.get('count')
+        warehouse_id = request.POST.get('warehouse_id')  # Get the warehouse_id from the form
+
+        # Check if all required fields are provided
+        if type and rate and capacity and count and warehouse_id:
+            # Create a new WarehouseType object with the provided data
+            WarehouseType.objects.create(
+                type=type,
+                rate=rate,
+                capacity=capacity,
+                count=count,
+                warehouse_id=warehouse_id  # Set the warehouse_id
+            )
+            # Redirect to a success URL or render a success message
+            return redirect('storage_type')  # Replace 'storage_type' with the appropriate URL name
+        else:
+            # Handle the case where required fields are missing
+            return render(request, 'warehouse/error.html', {'message': 'Missing required fields'})
+
+    # Fetch all warehouses to pass to the template
+    warehouses = Warehouse.objects.all()
+    
+    return render(request, 'warehouse/storage_type.html', {'warehouses': warehouses})
+
+
+def edit_storage_type(request, storage_type_id):
+    storage_type = get_object_or_404(WarehouseType, pk=storage_type_id)
+    if request.method == 'POST':
+        storage_type.type = request.POST.get('type')
+        storage_type.rate = request.POST.get('rate')
+        storage_type.capacity = request.POST.get('capacity')
+        storage_type.count = request.POST.get('count')
+        warehouse_id = request.POST.get('warehouse_id')  # Get the selected warehouse ID
+        storage_type.warehouse_id = warehouse_id  # Update the warehouse ID for the storage type
+        storage_type.save()
+        return redirect('storage_type')  # Redirect back to the storage type page after editing
+
+def delete_storage_type(request, storage_type_id):
+    if request.method == 'POST':
+        storage_type = WarehouseType.objects.get(pk=storage_type_id)
+        storage_type.delete()
+        return redirect('storage_type')
+
+
+def togle_view(request):
+    return render(request, 'warehouse/error.html')
 
 
 

@@ -108,9 +108,19 @@ urlpatterns = [
     path('supplier_selection/', views.supplier_selection, name='supplier_selection'),
     path('new_purchase/', views.new_purchase, name='new_purchase'),
 
+    # warehose-main view
     path('warehouse_view/', views.warehouse_view, name='warehouse_view'),
     path('add/', views.add_warehouse, name='add_warehouse'),
     path('edit/<int:pk>/', views.edit_warehouse, name='edit_warehouse'),
     path('delete/<int:pk>/', views.delete_warehouse, name='delete_warehouse'),
     path('search-warehouse/', views.search_warehouse, name='search_warehouse'),
+
+    # storage type
+    path('storage_type/', views.storage_type, name='storage_type'),
+    path('add_storage_type/', views.add_storage_type, name='add_storage_type'),
+    path('edit_storage_type/<int:storage_type_id>/', views.edit_storage_type, name='edit_storage_type'),
+    path('delete_storage_type/<int:storage_type_id>/', views.delete_storage_type, name='delete_storage_type'),
+
+
+    path('error_view/', views.togle_view, name='error_view'),
 ]

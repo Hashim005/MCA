@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator
 
 class Users(AbstractUser):
     class Role(models.TextChoices):
@@ -231,6 +232,22 @@ class Warehouse(models.Model):
     def __str__(self):
         return self.name
 
+
+class WarehouseType(models.Model):
+    SIZE_CHOICES = (
+        ('s', 'Small'),
+        ('m', 'Medium'),
+        ('l', 'Large'),
+    )
+
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
+    type = models.CharField(max_length=1, choices=SIZE_CHOICES)
+    rate = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    capacity = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    count = models.IntegerField(validators=[MinValueValidator(0)])
+
+    def __str__(self):
+        return f"{self.get_type_display()} - {self.warehouse.name}"
 
 
     

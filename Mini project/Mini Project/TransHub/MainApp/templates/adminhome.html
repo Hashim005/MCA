@@ -82,12 +82,12 @@
 					<span class="text">warehouse</span>
 				</a>
 			</li>
-			<li>
+			{% comment %} <li>
 				<a href="{% url 'inventory_view' %}">
 					<i class='bx bx-archive'></i> <!-- Assuming 'bx-archive' represents an inventory icon in Bootstrap -->
 					<span class="text">Inventory</span>
 				</a>
-			</li>
+			</li> {% endcomment %}
 
 			<li>
 				<a href="{% url 'supplier_selection' %}">
@@ -95,8 +95,27 @@
 					<span class="text">purchase-stock</span>
 				</a>
 			</li>
-			
 			<li>
+				<a href="#" id="supplierToggle">
+					<i class='bx bx-user'></i> <!-- Assuming 'bx-user' represents a suppliers icon in Bootstrap -->
+					<span class="text">warehouse</span>
+				</a>
+				<ul class="collapse list-unstyled" id="supplierSubmenu">
+					<li>
+						<a class="sidebar-text sidebar-subitem sidebar-button" href="{% url 'warehouse_view' %}">
+							<i class="fas fa-dot-circle"></i> warehouse view
+						</a>
+					</li>
+					<li>
+						<a class="sidebar-text sidebar-subitem sidebar-button" href="{% url 'storage_type' %}">
+							<i class="fas fa-dot-circle"></i> storage type
+						</a>
+					</li>
+					
+				</ul>
+			</li>
+			
+			{% comment %} <li>
 				<a href="#" id="supplierToggle">
 					<i class='bx bx-user'></i> <!-- Assuming 'bx-user' represents a suppliers icon in Bootstrap -->
 					<span class="text">Suppliers</span>
@@ -113,7 +132,7 @@
 						</a>
 					</li>
 				</ul>
-			</li>
+			</li> {% endcomment %}
 		
 		</ul>
 		<ul class="side-menu">

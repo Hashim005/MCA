@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sublist Example</title>
+<style>
+  .sublist {
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<ul>
+  <li>
+    <a href="#" class="toggle-sublist">
+      <i class='bx bx-message-rounded-detail'></i>  
+      <span class="text">warehouse</span>
+    </a>
+    <ul class="sublist">
+      <li>hashim</li>
+      <li>ashraf</li>
+    </ul>
+  </li>
+</ul>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggleSublist = document.querySelector('.toggle-sublist');
+    const sublist = toggleSublist.nextElementSibling;
+
+    toggleSublist.addEventListener('click', function(event) {
+      event.preventDefault();
+      sublist.classList.toggle('active');
+    });
+  });
+</script>
+
+</body>
+</html>

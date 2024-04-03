@@ -248,6 +248,43 @@ class WarehouseType(models.Model):
 
     def __str__(self):
         return f"{self.get_type_display()} - {self.warehouse.name}"
+    
+
+class StorageMapDup(models.Model):
+    warehouse_type = models.ForeignKey(WarehouseType, on_delete=models.CASCADE)
+    selected_seats_display = models.CharField(max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.warehouse_type.warehouse.name} ({self.warehouse_type.get_type_display()})"
 
 
+# storage user
+class StorageUser(models.Model):
+    STATUS_CHOICES = (
+        ('1', 'False'),
+        ('2', 'True'),
+    )
+
+    user_id = models.CharField(primary_key=True, max_length=50)
+    user = models.CharField(max_length=100)
+    email = models.EmailField(max_length=254, default='example@example.com')  # Adding email field with a default value
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
+    warehouse_type = models.ForeignKey(WarehouseType, on_delete=models.CASCADE)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    is_paid = models.CharField(max_length=2, choices=STATUS_CHOICES, default='1')
+
+    def __str__(self):
+        return f"{self.user_id} - {self.user}"
+
+
+# storage map
+class StorageMap(models.Model):
+    storageNumber = models.CharField(max_length=50)
+    warehouse_type = models.ForeignKey(WarehouseType, on_delete=models.CASCADE)
+    storage_user = models.ForeignKey(StorageUser, on_delete=models.CASCADE)  # Add this line
+
+    def __str__(self):
+        return f"Storage Number: {self.storageNumber} - {self.warehouse_type.warehouse.name} ({self.warehouse_type.get_type_display()})"
     

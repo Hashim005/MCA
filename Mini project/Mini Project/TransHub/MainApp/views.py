@@ -1,14 +1,14 @@
 from collections import UserDict
 import json
 from msilib.schema import ListView
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import login, authenticate, logout
 from django.views import View
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
-from .models import BRAND_CHOICES, CATEGORY, Bus, Category, Location, Schedule, Users,Seat_map,Address,Supplier,Stock, Warehouse,WarehouseType
+from .models import BRAND_CHOICES, CATEGORY, Bus, Category, Location, Schedule, StorageMapDup, Users,Seat_map,Address,Supplier,Stock, Warehouse,WarehouseType
 from TransHub.settings import EMAIL_HOST_USER
 from .models import Users
 from django.core.mail import send_mail
@@ -1429,19 +1429,91 @@ def delete_storage_type(request, storage_type_id):
 def togle_view(request):
     return render(request, 'warehouse/error.html')
 
+def warehouse_template_page(request):
+    return render(request, 'base1.html')
 
 
+from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 
+from django.http import HttpResponseBadRequest
 
+from django.shortcuts import render, redirect, HttpResponse
+from .models import WarehouseType, StorageMapDup
+import json
 
+def warehouse_booking_page(request):
+    if request.method == 'POST':
+        selected_seats_json = request.POST.get('data_list')
+        selected_seats = json.loads(selected_seats_json)
+        warehouse_type_id = request.POST.get('warehouse_type')
 
+        # Check if warehouse_type_id is empty or not a valid integer
+        if not warehouse_type_id:
+            return HttpResponseBadRequest("Warehouse type ID is empty")
+        
+        try:
+            # Try converting warehouse_type_id to an integer
+            warehouse_type_id = int(warehouse_type_id)
+        except ValueError:
+            return HttpResponseBadRequest("Invalid warehouse type ID")
 
+        try:
+            # Retrieve the warehouse type object
+            warehouse_type = WarehouseType.objects.get(id=warehouse_type_id)
+        except WarehouseType.DoesNotExist:
+            return HttpResponseBadRequest("Warehouse type ID does not exist")
 
+        selected_seats_display = ', '.join(selected_seats)  # Join selected seats into a string
 
+        # Save selected seat numbers and display value to the database
+        for seat_number in selected_seats:
+            storage_map = StorageMapDup(warehouse_type=warehouse_type, selected_seats_display=selected_seats_display)
+            storage_map.save()
 
+        # Redirect to storage_user_details.html
+        return redirect('storage_user_details')
+
+    # If the request method is not POST, render the warehouse booking page
+    warehouse_type = WarehouseType.objects.first()  # You might need to adjust this query based on your application logic
+    return render(request, 'booking/warehouse_booking.html', {'warehouse_type': warehouse_type})
     
 
+import datetime
+def storage_user_details(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        warehouse_id = request.POST.get('warehouse')
+        warehouse_type_id = request.POST.get('warehouse_type')
+        start_date_str = request.POST.get('start_date')
+        end_date_str = request.POST.get('end_date')
+
+        start_date = datetime.datetime.strptime(start_date_str, '%Y-%m-%d').date() if start_date_str else None
+        end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else None
+
+        if start_date and end_date:
+            warehouse_type = WarehouseType.objects.get(pk=warehouse_type_id)
+            rate = warehouse_type.rate
+
+            duration = (end_date - start_date).days
+            total_amount = rate * duration
+
+            return render(request, 'booking/storage_user_details.html', {
+                'username': username,
+                'warehouse_id': warehouse_id,
+                'warehouse_type_id': warehouse_type_id,
+                'start_date': start_date_str,
+                'end_date': end_date_str,
+                'total_amount': total_amount
+            })
+
+    # Handle GET request or invalid POST data
+    warehouses = Warehouse.objects.all()
+    warehouse_types = WarehouseType.objects.all()
+    return render(request, 'booking/storage_user_details.html', {'warehouses': warehouses, 'warehouse_types': warehouse_types})
+    
 
 
 

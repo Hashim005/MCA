@@ -3,39 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sublist Example</title>
+<title>User-Friendly Button</title>
 <style>
-  .sublist {
-    display: none;
+  /* Button Container Styles */
+  .button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  /* Button Styles */
+  .user-friendly-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: 2px solid #007bff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .user-friendly-button:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+
+  .user-friendly-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
   }
 </style>
 </head>
 <body>
 
-<ul>
-  <li>
-    <a href="#" class="toggle-sublist">
-      <i class='bx bx-message-rounded-detail'></i>  
-      <span class="text">warehouse</span>
-    </a>
-    <ul class="sublist">
-      <li>hashim</li>
-      <li>ashraf</li>
-    </ul>
-  </li>
-</ul>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const toggleSublist = document.querySelector('.toggle-sublist');
-    const sublist = toggleSublist.nextElementSibling;
-
-    toggleSublist.addEventListener('click', function(event) {
-      event.preventDefault();
-      sublist.classList.toggle('active');
-    });
-  });
-</script>
+<div class="button-container">
+  <button type="button" class="user-friendly-button">
+    Click Me
+  </button>
+</div>
 
 </body>
 </html>

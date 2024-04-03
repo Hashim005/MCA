@@ -120,7 +120,10 @@ urlpatterns = [
     path('add_storage_type/', views.add_storage_type, name='add_storage_type'),
     path('edit_storage_type/<int:storage_type_id>/', views.edit_storage_type, name='edit_storage_type'),
     path('delete_storage_type/<int:storage_type_id>/', views.delete_storage_type, name='delete_storage_type'),
-
-
     path('error_view/', views.togle_view, name='error_view'),
+
+    path('warehouse_template/', views.warehouse_template_page, name='warehouse_template'),
+    path('warehouse_booking/', views.warehouse_booking_page, name='warehouse_booking'),
+    path('storage_user_details/', views.storage_user_details, name='storage_user_details'),
+   
 ]

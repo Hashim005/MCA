@@ -70,6 +70,39 @@
       border-radius: 50%;
       overflow: hidden;
     }
+
+    /* button code*/
+      /* Button Container Styles */
+      .button-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+    
+      /* Button Styles */
+      .user-friendly-button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #fff;
+        background-color: #007bff;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+    
+      .user-friendly-button:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+      }
+    
+      .user-friendly-button:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+      }
+    
     </style>
     
   </head>
@@ -147,7 +180,7 @@
     
     <div class="site-block-wrap">
     <div class="owl-carousel with-dots">
-      <div class="site-blocks-cover overlay overlay-2" style="background-image: url({% static 'MainApp/images/hero_1.jpg' %});" data-aos="fade" id="home-section">
+      <div class="site-blocks-cover overlay overlay-2" style="background-image: url({% static 'MainApp/images/warehouse3.jpg' %});" data-aos="fade" id="home-section">
 
 
         <div class="container">
@@ -155,6 +188,11 @@
             <div class="col-md-6 mt-lg-5 text-center">
               <h1 class="text-shadow">Where Organization Meets Innovation: Welcome to Our Warehouse</h1>
               <p class="mb-5 text-shadow">Welcome to Our Warehouse: Where Efficiency Finds Its Home  </p>
+              <div class="button-container">
+                <button type="button" class="user-friendly-button">
+                  BOOK ROOM
+                </button>
+              </div>
               
             </div>
           </div>
@@ -163,7 +201,7 @@
         
       </div>  
   
-      <div class="site-blocks-cover overlay overlay-2" style="background-image: url({% static 'MainApp/images/hero_2.jpg' %});" data-aos="fade" id="home-section">
+      <div class="site-blocks-cover overlay overlay-2" style="background-image: url({% static 'MainApp/images/warehouse2.jpg' %});" data-aos="fade" id="home-section">
   
   
         <div class="container">
@@ -171,7 +209,11 @@
             <div class="col-md-6 mt-lg-5 text-center">
               <h1 class="text-shadow">Find Your Space, Find Your Pace: Experience Our Warehouse Today</h1>
               <p class="mb-5 text-shadow"><p class="mb-5 text-shadow">Step into our warehouse, where meticulous organization meets cutting-edge technology, offering you the perfect harmony of space and pace.  </p>
-              
+              <div class="button-container">
+                <button type="button" class="user-friendly-button">
+                  BOOK ROOM
+                </button>
+              </div>
               
             </div>
           </div>
